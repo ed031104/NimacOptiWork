@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+	<Product Id="*"
+			 Name="NimacOptiWork"
+			 Language="1033"
+			 Version="1.0.0.0"
+			 Manufacturer="TuEmpresa"
+			 UpgradeCode="017f850f-0ca9-4e85-b9cd-db1ef83d3513">
+
+		<Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="Ya hay una versión más reciente instalada." />
+		<MediaTemplate />
+
+		<!-- Características del instalador -->
+		<Feature Id="ProductFeature" Title="NimacOptiWork" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentRef Id="ApplicationShortcutDesktop" />
+			<ComponentRef Id="ApplicationShortcutStartMenu" />
+		</Feature>
+	</Product>
+
+	<!-- Directorios -->
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="NimacOptiWork" />
+			</Directory>
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="NimacOptiWork" />
+			</Directory>
+			<Directory Id="DesktopFolder" />
+		</Directory>
+	</Fragment>
+
+	<!-- Archivos -->
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<!-- Ejecutable principal -->
+			<Component Id="MainExecutable" Guid="c7335729-684c-4c4f-b149-20306fae1abb">
+				<File Id="NimacOptiWorkExe" Source="C:\publish\NimacOptiWork\NimacOptiWork.exe" KeyPath="yes" />
+			</Component>
+
+			<!-- Otros archivos de tu carpeta publicada -->
+			<Component Id="Dependencies" Guid="edb0a3ba-d9bc-4045-a62c-3dbdaf4f95cc">
+				<File Source="C:\publish\NimacOptiWork\NimacOptiWork.dll" />
+				<File Source="C:\publish\NimacOptiWork\Newtonsoft.Json.dll" />
+				<!-- Agrega aquí todas las DLL, config, assets, etc. -->
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<!-- Atajos -->
+	<Fragment>
+		<!-- Acceso directo en escritorio -->
+		<Component Id="ApplicationShortcutDesktop" Guid="3ffd4ef5-1d27-4215-bf44-c799d34107d2" Directory="DesktopFolder">
+			<Shortcut Id="DesktopShortcut"
+					  Name="NimacOptiWork"
+					  Description="Abrir NimacOptiWork"
+					  Target="[INSTALLFOLDER]NimacOptiWork.exe"
+					  WorkingDirectory="INSTALLFOLDER" />
+			<RemoveFolder Id="DesktopFolder" On="uninstall" />
+			<RegistryValue Root="HKCU" Key="Software\NimacOptiWork" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+		</Component>
+
+		<!-- Acceso directo en menú inicio -->
+		<Component Id="ApplicationShortcutStartMenu" Guid="5296a1d7-d0a0-4c4a-9788-2e62c4975d69" Directory="ApplicationProgramsFolder">
+			<Shortcut Id="StartMenuShortcut"
+					  Name="NimacOptiWork"
+					  Description="Abrir NimacOptiWork"
+					  Target="[INSTALLFOLDER]NimacOptiWork.exe"
+					  WorkingDirectory="INSTALLFOLDER" />
+			<RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+			<RegistryValue Root="HKCU" Key="Software\NimacOptiWork" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+		</Component>
+	</Fragment>
+
+</Wix>

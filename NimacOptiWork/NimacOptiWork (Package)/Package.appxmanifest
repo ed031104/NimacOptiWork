@@ -10,7 +10,7 @@
   <Identity
     Name="c28ee6e4-de32-4d7c-b479-e9c2b68bc6ea"
     Publisher="CN=Fredd"
-    Version="1.0.0.0" />
+    Version="1.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="c28ee6e4-de32-4d7c-b479-e9c2b68bc6ea" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

@@ -68,6 +68,8 @@
                 </NavigationViewItem>
                 <NavigationViewItem Content="Gestión de usuarios" Icon="OtherUser" Tag="Gestión de usuarios"/>
                 <NavigationViewItem Content="Configuración" Icon="Setting" Tag="settings"/>
+                <NavigationViewItem Content="Calendario" Icon="Calendar" Tag="Calendario"/>
+                <NavigationViewItem Content="Gestión de actividades" Icon="AllApps" Tag="Gestión de actividades"/>
             </NavigationView.MenuItems>
 
             <!--Contenedor de páginas-->

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="NimacOptiWork.Page.GestionInvoice"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NimacOptiWork.Page"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:controls1="using:NimacOptiWork.Components"
+    mc:Ignorable="d">
+
+    <Grid Padding="20 0 20 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Fila 0 -->
+            <RowDefinition Height="*"/>
+            <!-- Fila 1 -->
+        </Grid.RowDefinitions>
+
+        <StackPanel 
+        Grid.Row="0"
+        Padding="0 50 0 50"
+        >
+            <TextBlock FontSize="20" Text="Gestión de Usuarios" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
+
+            <ScrollViewer
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto"
+                >
+
+                <controls:DataGrid
+                    x:Name="dataGridInvoices"
+                    HeadersVisibility="Column"
+                    ItemsSource="{x:Bind invoicesFromDb, Mode=OneWay}"
+                    AutoGenerateColumns="False"
+                >
+
+                    <controls:DataGrid.Columns>
+                        <controls:DataGridTextColumn Header="Invoice ID" Binding="{Binding InvoiceId}" IsReadOnly="True" Width="50"/>
+                        <controls:DataGridTextColumn Header="STNO" Binding="{Binding Stno}" />
+                        <controls:DataGridTextColumn Header="BOSFX" Binding="{Binding Bosfx}" />
+                        <controls:DataGridTemplateColumn Header="Status">
+                            <controls:DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <controls1:statusInvoice TypeStatusInvoice="{Binding statusInvoices}"/>
+                                </DataTemplate>
+                            </controls:DataGridTemplateColumn.CellTemplate>
+                        </controls:DataGridTemplateColumn>
+                        <controls:DataGridTextColumn Header="SLSTYP" Binding="{Binding Slstyp}" Width="100"/>
+                        <controls:DataGridTextColumn Header="ENDT8" Binding="{Binding Endt8}" Width="100"/>
+                        <controls:DataGridTextColumn Header="DOCSU" Binding="{Binding Docsu}" Width="100"/>
+                        <controls:DataGridTextColumn Header="RFDCNO" Binding="{Binding Rfdcno}" Width="100"/>
+                        <controls:DataGridTextColumn Header="LNNO" Binding="{Binding Lnno}" Width="100"/>
+                        <controls:DataGridTextColumn Header="SOS1" Binding="{Binding Sos1}" Width="100"/>
+                        <controls:DataGridTextColumn Header="PAN020" Binding="{Binding Pano20}" Width="100"/>
+                        <controls:DataGridTextColumn Header="DS18" Binding="{Binding Ds18}" Width="100"/>
+                        <controls:DataGridTextColumn Header="QRQY" Binding="{Binding Orqy}" Width="100"/>
+                        <controls:DataGridTextColumn Header="BOIMCT" Binding="{Binding Boimct}" Width="100"/>
+                        <controls:DataGridTextColumn Header="SPQTY" Binding="{Binding Spqty}" Width="100"/>
+                        <controls:DataGridTextColumn Header="TRXCD" Binding="{Binding Trxcd}" Width="100"/>
+                        <controls:DataGridTextColumn Header="UNCS" Binding="{Binding Uncs}" Width="100"/>
+                        <controls:DataGridTextColumn Header="UNLS" Binding="{Binding Unls}" Width="100"/>
+                        <controls:DataGridTextColumn Header="UNSEL" Binding="{Binding Unsel}" Width="100"/>
+                        <controls:DataGridTextColumn Header="WTUM" Binding="{Binding Wtum}" Width="100"/>
+                        <controls:DataGridTextColumn Header="CUNM" Binding="{Binding Cunm}" Width="100"/>
+                        <controls:DataGridTextColumn Header="SPVIDS" Binding="{Binding Spvids}" Width="100"/>
+                        <controls:DataGridTextColumn Header="Date Entry" Binding="{Binding DateEntry}"/>
+
+                        <!-- Columna editar -->
+                        <controls:DataGridTemplateColumn Header="Editar">
+                            <controls:DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button 
+                                Click="editInvoiceEventBtn"
+                                Tag="{Binding InvoiceId}"
+                                HorizontalAlignment="Center"
+                                >
+                                        <Button.Content>
+                                            <FontIcon Glyph="&#xE70F;" FontSize="16"/>
+                                        </Button.Content>
+                                    </Button>
+                                </DataTemplate>
+                            </controls:DataGridTemplateColumn.CellTemplate>
+                        </controls:DataGridTemplateColumn>
+
+                        <!-- Columna eliminar -->
+                        <controls:DataGridTemplateColumn Header="Eliminar">
+                            <controls:DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Button 
+                                        Click="deleteInvoiceEventBtn"
+                                        Tag="{Binding InvoiceId}"
+                                        HorizontalAlignment="Center"
+                                    >
+                                            <Button.Content>
+                                                <FontIcon Glyph="&#xE74D;" FontSize="16"/>
+                                            </Button.Content>
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </controls:DataGridTemplateColumn.CellTemplate>
+                        </controls:DataGridTemplateColumn>
+                    </controls:DataGrid.Columns>
+                </controls:DataGrid>
+            </ScrollViewer>
+        </Grid>
+        <!-- Overlay de carga -->
+        <Grid x:Name="loadingOverlay" Background="#80000000" Visibility="Collapsed">
+            <ProgressRing Width="60" Height="60" IsActive="True"/>
+        </Grid>
+    </Grid>
+
+</Page>
