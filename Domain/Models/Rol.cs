@@ -1,31 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Models;
 
-[Table("Rol", Schema = "auth")]
-public partial class Rol
+public class Rol
 {
-    [Key]
     public int Id { get; set; }
 
-    [StringLength(50)]
-    [Unicode(false)]
     public string Name { get; set; } = null!;
 
-    [StringLength(255)]
-    [Unicode(false)]
     public string? Description { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime? DateCreated { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime? DateModified { get; set; }
 
-    [InverseProperty("Rol")]
-    public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+    #region Constructors
+    public Rol()
+    {
+    }
+    public Rol(int id, string name, string? description = null, DateTime? dateCreated = null, DateTime? dateModified = null)
+    {
+        Id = id;
+        Name = name;
+        Description = description;
+        DateCreated = dateCreated;
+        DateModified = dateModified;
+    }
+    #endregion
+
+    #region Pattern Builder
+    public class Builder
+    {
+        private readonly Rol _rol;
+        public Builder()
+        {
+            _rol = new Rol();
+        }
+        public Builder WithId(int id)
+        {
+            _rol.Id = id;
+            return this;
+        }
+        public Builder WithName(string name)
+        {
+            _rol.Name = name;
+            return this;
+        }
+        public Builder WithDescription(string? description)
+        {
+            _rol.Description = description;
+            return this;
+        }
+        public Builder WithDateCreated(DateTime? dateCreated)
+        {
+            _rol.DateCreated = dateCreated;
+            return this;
+        }
+        public Builder WithDateModified(DateTime? dateModified)
+        {
+            _rol.DateModified = dateModified;
+            return this;
+        }
+        public Rol Build()
+        {
+            return _rol;
+        }
+    }
+    #endregion
 }

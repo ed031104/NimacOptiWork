@@ -67,8 +67,8 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem Content="Gestión de usuarios" Icon="OtherUser" Tag="Gestión de usuarios"/>
-                <NavigationViewItem Content="Configuración" Icon="Setting" Tag="settings"/>
-                <NavigationViewItem Content="Calendario" Icon="Calendar" Tag="Calendario"/>
+                <NavigationViewItem Content="Gestión de tareas" Icon="Setting" Tag="Gestión de tareas"/>
+                <NavigationViewItem Content="Backlog" Icon="Calendar" Tag="Backlog"/>
                 <NavigationViewItem Content="Gestión de actividades" Icon="AllApps" Tag="Gestión de actividades"/>
             </NavigationView.MenuItems>
 

@@ -51,13 +51,17 @@ namespace NimacOptiWork
                         // Acción para "Dashboard"
                         ContentArea.Navigate(typeof(Dashboard));
                         break;
-                    case "Calendario":
+                    case "Backlog":
                         // Acción para "Calendario"
-                        ContentArea.Navigate(typeof(GestionActivty));
+                        ContentArea.Navigate(typeof(Backlog));
                         break;
                     case "Gestión de actividades":
                         // Acción para "Reportes"
                         ContentArea.Navigate(typeof(GestionInvoice));
+                        break;
+                    case "Gestión de tareas":
+                        // Acción para "Reportes"
+                        ContentArea.Navigate(typeof(GestionTask));
                         break;
                     case "settings":
                         // Acción para "Configuración"

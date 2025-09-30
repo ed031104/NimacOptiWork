@@ -1,31 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Models;
 
-[Table("Task")]
 public partial class Task
 {
-    [Key]
-    [Column("TaskID")]
     public int TaskId { get; set; }
 
-    [StringLength(60)]
     public string InvoiceNumber { get; set; } = null!;
 
-    [StringLength(255)]
     public string Description { get; set; } = null!;
 
-    [Column(TypeName = "datetime")]
     public DateTime CreatedDate { get; set; }
 
-    [Column("CREATEDBy")]
-    [StringLength(50)]
     public string Createdby { get; set; } = null!;
 
-    [InverseProperty("Task")]
-    public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
+    #region Constructors
+    public Task()
+    {
+    }
+    public Task(int taskId, string invoiceNumber, string description, DateTime createdDate, string createdby)
+    {
+        TaskId = taskId;
+        InvoiceNumber = invoiceNumber;
+        Description = description;
+        CreatedDate = createdDate;
+        Createdby = createdby;
+    }
+    #endregion
+
+    #region Pattern Builder
+    public class Builder
+    {
+        private readonly Task _task;
+        public Builder()
+        {
+            _task = new Task();
+        }
+        public Builder WithTaskId(int taskId)
+        {
+            _task.TaskId = taskId;
+            return this;
+        }
+        public Builder WithInvoiceNumber(string invoiceNumber)
+        {
+            _task.InvoiceNumber = invoiceNumber;
+            return this;
+        }
+        public Builder WithDescription(string description)
+        {
+            _task.Description = description;
+            return this;
+        }
+        public Builder WithCreatedDate(DateTime createdDate)
+        {
+            _task.CreatedDate = createdDate;
+            return this;
+        }
+        public Builder WithCreatedby(string createdby)
+        {
+            _task.Createdby = createdby;
+            return this;
+        }
+        public Task Build()
+        {
+            return _task;
+        }
+    }
+    #endregion
 }

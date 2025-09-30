@@ -1,9 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+﻿using Application.Context;
+using Application.Services.Generic;
+using Domain.Interfaces.Repositories;
+using Domain.Interfaces.Services;
+using Infraestructure;
+using Infraestructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -12,11 +16,15 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using Microsoft.Extensions.Configuration;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -27,8 +35,9 @@ namespace NimacOptiWork
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
-    public partial class App : Application
+    public partial class App : Microsoft.UI.Xaml.Application // Explicitly specify the namespace to avoid ambiguity
     {
+        public static IHost AppHost { get; private set; }
         private Window? _window;
 
         /// <summary>
@@ -38,6 +47,22 @@ namespace NimacOptiWork
         public App()
         {
             InitializeComponent();
+
+            string STRING_CONNECTION = "Server=.;Database=NimacOptiWork;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=True;";
+
+            AppHost = Host.CreateDefaultBuilder()
+               .ConfigureServices((context, services) =>
+               {
+                   services.AddDbContext<NimacOptiWorkContext>(options =>
+                        options.UseSqlServer(STRING_CONNECTION)
+                   );
+
+                   // Replace the problematic line with the following:
+                   services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
+                   services.AddTransient(typeof(IRepository<,>), typeof(GenericRepository<,>));
+                   services.AddScoped(typeof(IServices<,>), typeof(ServicesGeneric<,>));
+               })
+               .Build();
         }
 
         /// <summary>

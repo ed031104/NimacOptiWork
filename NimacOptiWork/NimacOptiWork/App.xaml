@@ -6,6 +6,32 @@
     xmlns:local="using:NimacOptiWork">
     <Application.Resources>
         <ResourceDictionary>
+
+            <SolidColorBrush x:Key="CardBackgroundWhite" Color="#f7f7f7"/>
+            <SolidColorBrush x:Key="CardBackgroundBlack" Color="#171717"/>
+
+            <SolidColorBrush x:Key="ForegroundSecond" Color="#a19a97"/>
+            
+            <!--Color carda tag statues-->
+            <SolidColorBrush x:Key="StatusInProgresing" Color="#1549e6"/>
+            <SolidColorBrush x:Key="StatusInForDoing" Color="#ededed"/>
+            <SolidColorBrush x:Key="StatusInCompleted" Color="#00bd7e"/>
+            
+            <!--Color para texto de tags de estados-->
+            <SolidColorBrush x:Key="StatusInProgresingForeground" Color="#fafafa"/>
+            <SolidColorBrush x:Key="StatusInForDoingForeground" Color="#636663"/>
+            <SolidColorBrush x:Key="StatusInCompletedForeground" Color="#faf7f5"/>
+
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="CardBackground" Color="#f7f7f7"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="CardBackground" Color="#171717"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <!-- Other merged dictionaries here -->

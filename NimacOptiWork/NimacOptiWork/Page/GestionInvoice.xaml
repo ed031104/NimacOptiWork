@@ -6,9 +6,10 @@
     xmlns:local="using:NimacOptiWork.Page"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:controls1="using:NimacOptiWork.Components"
+    xmlns:tv="using:WinUI.TableView"
     mc:Ignorable="d">
+
 
     <Grid Padding="20 0 20 0">
         <Grid.RowDefinitions>
@@ -25,54 +26,59 @@
             <TextBlock FontSize="20" Text="Gestión de Usuarios" />
         </StackPanel>
 
-        <Grid Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
+        <Grid Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Canvas.ZIndex="1">
 
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            
             <ScrollViewer
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto"
                 >
 
-                <controls:DataGrid
+                <tv:TableView
                     x:Name="dataGridInvoices"
-                    HeadersVisibility="Column"
-                    ItemsSource="{x:Bind invoicesFromDb, Mode=OneWay}"
+                    ItemsSource="{x:Bind invoicesFromDb, Mode=OneTime}"
                     AutoGenerateColumns="False"
+                    xmlns:tv="using:WinUI.TableView"
                 >
 
-                    <controls:DataGrid.Columns>
-                        <controls:DataGridTextColumn Header="Invoice ID" Binding="{Binding InvoiceId}" IsReadOnly="True" Width="50"/>
-                        <controls:DataGridTextColumn Header="STNO" Binding="{Binding Stno}" />
-                        <controls:DataGridTextColumn Header="BOSFX" Binding="{Binding Bosfx}" />
-                        <controls:DataGridTemplateColumn Header="Status">
-                            <controls:DataGridTemplateColumn.CellTemplate>
+                    <tv:TableView.Columns>
+                        <tv:TableViewTextColumn Header="Invoice ID" Binding="{Binding InvoiceId}" IsReadOnly="True" Width="50"/>
+                        <tv:TableViewTextColumn Header="STNO" Binding="{Binding Stno}" />
+                        <tv:TableViewTextColumn Header="BOSFX" Binding="{Binding Bosfx}" />
+                        <tv:TableViewTemplateColumn Header="Status">
+                            <tv:TableViewTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <controls1:statusInvoice TypeStatusInvoice="{Binding statusInvoices}"/>
+                                    <controls1:statusInvoice TypeStatusInvoice="{Binding StatusInvoice}"/>
                                 </DataTemplate>
-                            </controls:DataGridTemplateColumn.CellTemplate>
-                        </controls:DataGridTemplateColumn>
-                        <controls:DataGridTextColumn Header="SLSTYP" Binding="{Binding Slstyp}" Width="100"/>
-                        <controls:DataGridTextColumn Header="ENDT8" Binding="{Binding Endt8}" Width="100"/>
-                        <controls:DataGridTextColumn Header="DOCSU" Binding="{Binding Docsu}" Width="100"/>
-                        <controls:DataGridTextColumn Header="RFDCNO" Binding="{Binding Rfdcno}" Width="100"/>
-                        <controls:DataGridTextColumn Header="LNNO" Binding="{Binding Lnno}" Width="100"/>
-                        <controls:DataGridTextColumn Header="SOS1" Binding="{Binding Sos1}" Width="100"/>
-                        <controls:DataGridTextColumn Header="PAN020" Binding="{Binding Pano20}" Width="100"/>
-                        <controls:DataGridTextColumn Header="DS18" Binding="{Binding Ds18}" Width="100"/>
-                        <controls:DataGridTextColumn Header="QRQY" Binding="{Binding Orqy}" Width="100"/>
-                        <controls:DataGridTextColumn Header="BOIMCT" Binding="{Binding Boimct}" Width="100"/>
-                        <controls:DataGridTextColumn Header="SPQTY" Binding="{Binding Spqty}" Width="100"/>
-                        <controls:DataGridTextColumn Header="TRXCD" Binding="{Binding Trxcd}" Width="100"/>
-                        <controls:DataGridTextColumn Header="UNCS" Binding="{Binding Uncs}" Width="100"/>
-                        <controls:DataGridTextColumn Header="UNLS" Binding="{Binding Unls}" Width="100"/>
-                        <controls:DataGridTextColumn Header="UNSEL" Binding="{Binding Unsel}" Width="100"/>
-                        <controls:DataGridTextColumn Header="WTUM" Binding="{Binding Wtum}" Width="100"/>
-                        <controls:DataGridTextColumn Header="CUNM" Binding="{Binding Cunm}" Width="100"/>
-                        <controls:DataGridTextColumn Header="SPVIDS" Binding="{Binding Spvids}" Width="100"/>
-                        <controls:DataGridTextColumn Header="Date Entry" Binding="{Binding DateEntry}"/>
+                            </tv:TableViewTemplateColumn.CellTemplate>
+                        </tv:TableViewTemplateColumn>
+                        <tv:TableViewTextColumn Header="SLSTYP" Binding="{Binding Slstyp}" Width="100"/>
+                        <tv:TableViewTextColumn Header="ENDT8" Binding="{Binding Endt8}" Width="100"/>
+                        <tv:TableViewTextColumn Header="DOCSU" Binding="{Binding Docsu}" Width="100"/>
+                        <tv:TableViewTextColumn Header="RFDCNO" Binding="{Binding Rfdcno}" Width="100"/>
+                        <tv:TableViewTextColumn Header="LNNO" Binding="{Binding Lnno}" Width="100"/>
+                        <tv:TableViewTextColumn Header="SOS1" Binding="{Binding Sos1}" Width="100"/>
+                        <tv:TableViewTextColumn Header="PAN020" Binding="{Binding Pano20}" Width="100"/>
+                        <tv:TableViewTextColumn Header="DS18" Binding="{Binding Ds18}" Width="100"/>
+                        <tv:TableViewTextColumn Header="QRQY" Binding="{Binding Orqy}" Width="100"/>
+                        <tv:TableViewTextColumn Header="BOIMCT" Binding="{Binding Boimct}" Width="100"/>
+                        <tv:TableViewTextColumn Header="SPQTY" Binding="{Binding Spqty}" Width="100"/>
+                        <tv:TableViewTextColumn Header="TRXCD" Binding="{Binding Trxcd}" Width="100"/>
+                        <tv:TableViewTextColumn Header="UNCS" Binding="{Binding Uncs}" Width="100"/>
+                        <tv:TableViewTextColumn Header="UNLS" Binding="{Binding Unls}" Width="100"/>
+                        <tv:TableViewTextColumn Header="UNSEL" Binding="{Binding Unsel}" Width="100"/>
+                        <tv:TableViewTextColumn Header="WTUM" Binding="{Binding Wtum}" Width="100"/>
+                        <tv:TableViewTextColumn Header="CUNM" Binding="{Binding Cunm}" Width="100"/>
+                        <tv:TableViewTextColumn Header="SPVIDS" Binding="{Binding Spvids}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Date Entry" Binding="{Binding DateEntry}"/>
 
                         <!-- Columna editar -->
-                        <controls:DataGridTemplateColumn Header="Editar">
-                            <controls:DataGridTemplateColumn.CellTemplate>
+                        <tv:TableViewTemplateColumn Header="Editar">
+                            <tv:TableViewTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button 
                                 Click="editInvoiceEventBtn"
@@ -84,12 +90,12 @@
                                         </Button.Content>
                                     </Button>
                                 </DataTemplate>
-                            </controls:DataGridTemplateColumn.CellTemplate>
-                        </controls:DataGridTemplateColumn>
+                            </tv:TableViewTemplateColumn.CellTemplate>
+                        </tv:TableViewTemplateColumn>
 
                         <!-- Columna eliminar -->
-                        <controls:DataGridTemplateColumn Header="Eliminar">
-                            <controls:DataGridTemplateColumn.CellTemplate>
+                        <tv:TableViewTemplateColumn Header="Eliminar">
+                            <tv:TableViewTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
                                         <Button 
@@ -103,14 +109,27 @@
                                         </Button>
                                     </Grid>
                                 </DataTemplate>
-                            </controls:DataGridTemplateColumn.CellTemplate>
-                        </controls:DataGridTemplateColumn>
-                    </controls:DataGrid.Columns>
-                </controls:DataGrid>
+                            </tv:TableViewTemplateColumn.CellTemplate>
+                        </tv:TableViewTemplateColumn>
+                    </tv:TableView.Columns>
+                </tv:TableView>
             </ScrollViewer>
+
+            <StackPanel Grid.Row="2" HorizontalAlignment="Center">
+                <PipsPager
+                    x:Name="pipsPager"
+                    NumberOfPages="1"
+                    SelectedPageIndex="0"
+                    MaxVisiblePips="7"
+                    Orientation="Horizontal"
+                    PreviousButtonVisibility="Visible"
+                    NextButtonVisibility="Visible" 
+                    SelectedIndexChanged="pipsPager_SelectedIndexChanged"
+                />
+            </StackPanel>
         </Grid>
         <!-- Overlay de carga -->
-        <Grid x:Name="loadingOverlay" Background="#80000000" Visibility="Collapsed">
+        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="loadingOverlay" Background="#80000000" Visibility="Collapsed" Canvas.ZIndex="10">
             <ProgressRing Width="60" Height="60" IsActive="True"/>
         </Grid>
     </Grid>

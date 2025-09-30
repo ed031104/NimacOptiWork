@@ -1,40 +1,87 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Models;
 
-[Table("User", Schema = "auth")]
 public partial class User
 {
-    [Key]
     public int Id { get; set; }
 
-    [StringLength(100)]
-    [Unicode(false)]
     public string Email { get; set; } = null!;
 
-    [StringLength(50)]
-    [Unicode(false)]
     public string Username { get; set; } = null!;
 
-    [StringLength(255)]
-    [Unicode(false)]
     public string Password { get; set; } = null!;
 
-    [Column(TypeName = "datetime")]
     public DateTime? DateCreated { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime? DateModified { get; set; }
 
     public bool? Active { get; set; }
 
-    [InverseProperty("AssignedToNavigation")]
-    public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
+    #region Constructors
+    public User()
+    {
+    }
+    public User(int id, string email, string username, string password, DateTime? dateCreated = null, DateTime? dateModified = null, bool? active = null)
+    {
+        Id = id;
+        Email = email;
+        Username = username;
+        Password = password;
+        DateCreated = dateCreated;
+        DateModified = dateModified;
+        Active = active;
+    }
+    #endregion
 
-    [InverseProperty("User")]
-    public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+    #region Pattern Builder
+    public class Builder
+    {
+        private readonly User _user;
+        public Builder()
+        {
+            _user = new User();
+        }
+        public Builder WithId(int id)
+        {
+            _user.Id = id;
+            return this;
+        }
+        public Builder WithEmail(string email)
+        {
+            _user.Email = email;
+            return this;
+        }
+        public Builder WithUsername(string username)
+        {
+            _user.Username = username;
+            return this;
+        }
+        public Builder WithPassword(string password)
+        {
+            _user.Password = password;
+            return this;
+        }
+        public Builder WithDateCreated(DateTime? dateCreated)
+        {
+            _user.DateCreated = dateCreated;
+            return this;
+        }
+        public Builder WithDateModified(DateTime? dateModified)
+        {
+            _user.DateModified = dateModified;
+            return this;
+        }
+        public Builder WithActive(bool? active)
+        {
+            _user.Active = active;
+            return this;
+        }
+        public User Build()
+        {
+            return _user;
+        }
+    }
+    #endregion
 }

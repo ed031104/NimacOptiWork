@@ -78,7 +78,7 @@ namespace NimacOptiWork.Page
             {
                 new Axis
                 {
-                    Name = "Registros",
+                    Name = "Número de tareas",
                     MinLimit = 0
                 }
             };

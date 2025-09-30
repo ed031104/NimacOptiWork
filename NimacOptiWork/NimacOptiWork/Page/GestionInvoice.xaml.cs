@@ -1,43 +1,43 @@
+using Domain.Interfaces.Services;
 using Domain.Models;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace NimacOptiWork.Page;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class GestionInvoice : Microsoft.UI.Xaml.Controls.Page
 {
+    int itemsPerPage = 40;
+    private List<Invoice> _invoices;
 
+    private readonly IServices<Invoice, Infraestructure.Entities.Invoice> _invoiceService;
     ObservableCollection<Invoice> invoicesFromDb = new ObservableCollection<Invoice>();
 
     public GestionInvoice()
     {
         InitializeComponent();
-
+        _invoiceService = App.AppHost.Services.GetRequiredService<IServices<Invoice, Infraestructure.Entities.Invoice>>();
+        _invoices = new List<Invoice>();
         this.Loaded += Page_Loaded; // Subscribe to the Loaded event
     }
 
-    private async void Page_Loaded(object sender, RoutedEventArgs e) => await loadDataGrid();
+    private void Page_Loaded(object sender, RoutedEventArgs e) 
+    {
+        _= loadingInvoicesAsync();
+    }
+
+    private async System.Threading.Tasks.Task loadingInvoicesAsync() {
+        _invoices = (await _invoiceService.GetAllAsync()).ToList();
+
+        int totalCount = _invoices.Count();
+        pipsPager.NumberOfPages = (int)Math.Ceiling((double)totalCount / itemsPerPage);
+        loadDataGrid(0);
+    }
 
     private void editInvoiceEventBtn(object sender, RoutedEventArgs e)
     {
@@ -75,31 +75,28 @@ public sealed partial class GestionInvoice : Microsoft.UI.Xaml.Controls.Page
     }
 
 
-    private async System.Threading.Tasks.Task loadDataGrid()
+    private void loadDataGrid(int pageIndex)
     {
         loadingOverlay.Visibility = Visibility.Visible;
 
-        NimacOptiWorkContext dbContex = new NimacOptiWorkContext();
+        var listTemp = _invoices
+            .OrderByDescending(i => i.DateEntry)
+            .ThenByDescending(i => i.InvoiceId)
+            .Skip(pageIndex * itemsPerPage)
+            .Take(itemsPerPage);
 
-        using (var contexInvoice = new NimacOptiWorkContext())
+        invoicesFromDb.Clear();
+        foreach (var item in listTemp)
         {
-            var listTemp = await dbContex.Invoices
-                .OrderByDescending(i => i.DateEntry)
-                .ThenByDescending(i => i.InvoiceId)
-                .Take(100)
-                .ToListAsync();
-
-            DispatcherQueue.TryEnqueue(() =>
-            {
-                foreach (var item in listTemp)
-                    invoicesFromDb.Add(item);
-
-                System.Threading.Tasks.Task.Yield();
-            });
+            invoicesFromDb.Add(item);
         }
 
         loadingOverlay.Visibility = Visibility.Collapsed;
     }
 
+    private void pipsPager_SelectedIndexChanged(PipsPager sender, PipsPagerSelectedIndexChangedEventArgs args)
+    {
 
+        loadDataGrid(sender.SelectedPageIndex);  
+    }
 }

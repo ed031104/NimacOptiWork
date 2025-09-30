@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Models;
 
-[Table("TaskState")]
-[Index("TaskStateName", Name = "UQ__TaskStat__A3600986089B19C7", IsUnique = true)]
 public partial class TaskState
 {
-    [Key]
-    [Column("TaskStateID")]
     public int TaskStateId { get; set; }
 
-    [StringLength(50)]
     public string TaskStateName { get; set; } = null!;
+
+    
+    public TaskState()
+    {
+    }
+    public TaskState(int taskStateId, string taskStateName)
+    {
+        TaskStateId = taskStateId;
+        TaskStateName = taskStateName;
+    }
 }

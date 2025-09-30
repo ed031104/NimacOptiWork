@@ -9,17 +9,17 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Padding="20" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="20">
+    <Grid Padding="20" RowDefinitions="Auto,Auto,*" RowSpacing="20">
 
 
         <!-- Encabezado -->
-        <TextBlock Text="📊 Dashboard"
+        <TextBlock Text="Dashboard"
                 FontSize="28"
                 FontWeight="Bold"
                 Foreground="DodgerBlue"/>
 
         <!-- Tarjetas KPI -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" ColumnSpacing="15">
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="15">
             <Border Background="#FF0078D7" CornerRadius="8" Padding="15">
                 <StackPanel>
                     <TextBlock Text="Productividad" Foreground="White" FontSize="16"/>
@@ -29,87 +29,87 @@
 
             <Border Background="#FF107C10" CornerRadius="8" Padding="15" Grid.Column="1">
                 <StackPanel>
-                    <TextBlock Text="Eficiencia" Foreground="White" FontSize="16"/>
+                    <TextBlock Text="Tareas realizadas" Foreground="White" FontSize="16"/>
                     <TextBlock Text="92%" Foreground="White" FontSize="24" FontWeight="Bold"/>
                 </StackPanel>
             </Border>
 
-            <Border Background="#FFE81123" CornerRadius="8" Padding="15" Grid.Column="2">
+            <Border Background="#FFFFB900" CornerRadius="8" Padding="15" Grid.Column="2">
                 <StackPanel>
-                    <TextBlock Text="Errores" Foreground="White" FontSize="16"/>
-                    <TextBlock Text="3" Foreground="White" FontSize="24" FontWeight="Bold"/>
-                </StackPanel>
-            </Border>
-
-            <Border Background="#FFFFB900" CornerRadius="8" Padding="15" Grid.Column="3">
-                <StackPanel>
-                    <TextBlock Text="Proyectos Activos" Foreground="White" FontSize="16"/>
+                    <TextBlock Text="Total de tareas" Foreground="White" FontSize="16"/>
                     <TextBlock Text="5" Foreground="White" FontSize="24" FontWeight="Bold"/>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <Grid 
-         Background="DarkGray" 
-         Grid.Row="2"
-         ScrollViewer.HorizontalScrollMode="Enabled"
-         ScrollViewer.HorizontalScrollBarVisibility="Auto"
-         >
-            <ListView>
 
-                <ListView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ListView.ItemsPanel>
+        <ScrollViewer Grid.Row="2">
 
-                <Border Background="LightGray" CornerRadius="8" Padding="10" Margin="5">
-                    <StackPanel>
-                        <TextBlock Text="Hola mundo" FontWeight="Bold" FontSize="16"/>
-                        <TextBlock Text="soy gustavo" FontSize="14"/>
-                    </StackPanel>
-                </Border>
-                <Border Background="LightGray" CornerRadius="8" Padding="10" Margin="5">
-                    <StackPanel>
-                        <TextBlock Text="Hola mundo" FontWeight="Bold" FontSize="16"/>
-                        <TextBlock Text="soy gustavo" FontSize="14"/>
-                    </StackPanel>
-                </Border>
-                <Border Background="LightGray" CornerRadius="8" Padding="10" Margin="5">
-                    <StackPanel>
-                        <TextBlock Text="Hola mundo" FontWeight="Bold" FontSize="16"/>
-                        <TextBlock Text="soy gustavo" FontSize="14"/>
-                    </StackPanel>
-                </Border>
-                <Border Background="LightGray" CornerRadius="8" Padding="10" Margin="5">
-                    <StackPanel>
-                        <TextBlock Text="Hola mundo" FontWeight="Bold" FontSize="16"/>
-                        <TextBlock Text="soy gustavo" FontSize="14"/>
-                    </StackPanel>
-                </Border>
-                <Border Background="LightGray" CornerRadius="8" Padding="10" Margin="5">
-                    <StackPanel>
-                        <TextBlock Text="Hola mundo" FontWeight="Bold" FontSize="16"/>
-                        <TextBlock Text="soy gustavo" FontSize="14"/>
-                    </StackPanel>
-                </Border>
-            </ListView>
-        </Grid>
+            <StackPanel Spacing="10">
 
-        <!-- Gráfico -->
-        <Border Grid.Row="3" Background="DarkGray" CornerRadius="8" Padding="10" BorderBrush="LightGray" BorderThickness="1">
-            <StackPanel>
-                <TextBlock Text="Productividad semanal"
+                <!-- Gráfico -->
+                <Border Background="{ThemeResource CardBackground}" CornerRadius="8" Padding="10" BorderBrush="LightGray" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Productividad semanal"
                         FontSize="18" FontWeight="SemiBold"
                         Margin="0,0,0,10"/>
-                <lvc:CartesianChart
+                        <lvc:CartesianChart
                      Series="{x:Bind Series}"
                      XAxes="{Binding XAxes}"
                      YAxes="{Binding YAxes}"
-                     Foreground="Black"
+                     Foreground="White"
                      AnimationsSpeed="00:00:00.500"
                      Height="400"/>
+                    </StackPanel>
+                </Border>
+
+                <Grid 
+                    Background="{ThemeResource CardBackground}" 
+                   ScrollViewer.HorizontalScrollMode="Enabled"
+                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                >
+                    <ListView>
+
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+
+                        <Border Background="LightGray" CornerRadius="8" Padding="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Hola mundo" FontWeight="Bold" FontSize="16"/>
+                                <TextBlock Text="soy gustavo" FontSize="14"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="LightGray" CornerRadius="8" Padding="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Hola mundo" FontWeight="Bold" FontSize="16"/>
+                                <TextBlock Text="soy gustavo" FontSize="14"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="LightGray" CornerRadius="8" Padding="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Hola mundo" FontWeight="Bold" FontSize="16"/>
+                                <TextBlock Text="soy gustavo" FontSize="14"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="LightGray" CornerRadius="8" Padding="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Hola mundo" FontWeight="Bold" FontSize="16"/>
+                                <TextBlock Text="soy gustavo" FontSize="14"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="LightGray" CornerRadius="8" Padding="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Hola mundo" FontWeight="Bold" FontSize="16"/>
+                                <TextBlock Text="soy gustavo" FontSize="14"/>
+                            </StackPanel>
+                        </Border>
+                    </ListView>
+                </Grid>
             </StackPanel>
-        </Border>
+
+        </ScrollViewer>
     </Grid>
 </Page>

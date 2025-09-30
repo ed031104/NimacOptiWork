@@ -6,7 +6,7 @@
     xmlns:local="using:NimacOptiWork.Page"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:tv="using:WinUI.TableView"
     mc:Ignorable="d">
 
     <Grid Padding="20 0 20 0">
@@ -25,22 +25,21 @@
         </StackPanel>
 
         <Grid Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
-            <controls:DataGrid
+            <tv:TableView
               x:Name="dataGridUsers"
               AutoGenerateColumns="False"
               IsReadOnly="False"
-              SelectionMode="Single"
               >
 
-                <controls:DataGrid.Columns>
-                    <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="50"/>
-                    <controls:DataGridTextColumn Header="Nombre" Binding="{Binding Name}" Width="*"/>
-                    <controls:DataGridTextColumn Header="Correo" Binding="{Binding Email}" Width="*"/>
-                    <controls:DataGridTextColumn Header="Rol" Binding="{Binding Role}" Width="100"/>
+                <tv:TableView.Columns>
+                    <tv:TableViewTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                    <tv:TableViewTextColumn Header="Nombre" Binding="{Binding Name}" Width="*"/>
+                    <tv:TableViewTextColumn Header="Correo" Binding="{Binding Email}" Width="*"/>
+                    <tv:TableViewTextColumn Header="Rol" Binding="{Binding Role}" Width="100"/>
 
                     <!-- Columna editar -->
-                    <controls:DataGridTemplateColumn Header="Editar">
-                        <controls:DataGridTemplateColumn.CellTemplate>
+                    <tv:TableViewTemplateColumn Header="Editar">
+                        <tv:TableViewTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button 
                                   Click="editUserEventBtn"
@@ -51,12 +50,12 @@
                                     </Button.Content>
                                 </Button>
                             </DataTemplate>
-                        </controls:DataGridTemplateColumn.CellTemplate>
-                    </controls:DataGridTemplateColumn>
+                        </tv:TableViewTemplateColumn.CellTemplate>
+                    </tv:TableViewTemplateColumn>
 
                     <!-- Columna eliminar -->
-                    <controls:DataGridTemplateColumn Header="Eliminar">
-                        <controls:DataGridTemplateColumn.CellTemplate>
+                    <tv:TableViewTemplateColumn Header="Eliminar">
+                        <tv:TableViewTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button 
                                   Click="deleteUserEventBtn"
@@ -67,11 +66,11 @@
                                     </Button.Content>
                                 </Button>
                             </DataTemplate>
-                        </controls:DataGridTemplateColumn.CellTemplate>
-                    </controls:DataGridTemplateColumn>
+                        </tv:TableViewTemplateColumn.CellTemplate>
+                    </tv:TableViewTemplateColumn>
 
-                </controls:DataGrid.Columns>
-            </controls:DataGrid>
+                </tv:TableView.Columns>
+            </tv:TableView>
         </Grid>
 
     </Grid>

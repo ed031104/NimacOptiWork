@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Infraestructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Models;
+namespace Application.Context;
 
 public partial class NimacOptiWorkContext : DbContext
 {
-    string _stringConnection = string.Empty;
-
     public NimacOptiWorkContext()
     {
-        _stringConnection = Configuration.Configuracion.Get("ConnectionString:OptiWork") ?? "Server=.;Database=NimacOptiWork;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True;";
     }
 
     public NimacOptiWorkContext(DbContextOptions<NimacOptiWorkContext> options)
@@ -22,18 +20,20 @@ public partial class NimacOptiWorkContext : DbContext
 
     public virtual DbSet<Rol> Rols { get; set; }
 
-    public virtual DbSet<Task> Tasks { get; set; }
+    public virtual DbSet<Infraestructure.Entities.Task> Tasks { get; set; }
 
     public virtual DbSet<TaskAssignment> TaskAssignments { get; set; }
 
     public virtual DbSet<TaskState> TaskStates { get; set; }
 
+    public virtual DbSet<TaskStatusHistory> TaskStatusHistories { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-      => optionsBuilder.UseSqlServer(_stringConnection);
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //    => optionsBuilder.UseSqlServer("Server=.;Database=NimacOptiWork;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,7 +54,7 @@ public partial class NimacOptiWorkContext : DbContext
             entity.Property(e => e.DateModified).HasDefaultValueSql("(getdate())");
         });
 
-        modelBuilder.Entity<Task>(entity =>
+        modelBuilder.Entity<Infraestructure.Entities.Task>(entity =>
         {
             entity.HasKey(e => e.TaskId).HasName("PK__Task__7C6949D1DEFEA7B5");
 
@@ -79,6 +79,21 @@ public partial class NimacOptiWorkContext : DbContext
         modelBuilder.Entity<TaskState>(entity =>
         {
             entity.HasKey(e => e.TaskStateId).HasName("PK__TaskStat__C024635226E3FFD5");
+        });
+
+        modelBuilder.Entity<TaskStatusHistory>(entity =>
+        {
+            entity.HasKey(e => e.TaskStatusHistoryId).HasName("PK__TaskStat__AAC202A6B5FA61C1");
+
+            entity.Property(e => e.ChangedDate).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.Task).WithMany(p => p.TaskStatusHistories)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__TaskStatu__TaskI__7B5B524B");
+
+            entity.HasOne(d => d.TaskState).WithMany(p => p.TaskStatusHistories)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__TaskStatu__TaskS__7C4F7684");
         });
 
         modelBuilder.Entity<User>(entity =>
