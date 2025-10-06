@@ -13,10 +13,11 @@
 
     <Grid Padding="20 0 20 0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <!-- Fila 0 -->
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            
             <!-- Fila 1 -->
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <StackPanel 
@@ -26,16 +27,19 @@
             <TextBlock FontSize="20" Text="Gestión de Usuarios" />
         </StackPanel>
 
-        <Grid Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Canvas.ZIndex="1">
+        <Grid x:Name="containerTable" Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Canvas.ZIndex="0">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             
             <ScrollViewer
+
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto"
+                Canvas.ZIndex="0"
                 >
 
                 <tv:TableView
@@ -127,11 +131,75 @@
                     SelectedIndexChanged="pipsPager_SelectedIndexChanged"
                 />
             </StackPanel>
+
+            <!-- Popup -->
+            <Popup Grid.Row="0"  x:Name="StandardPopup" IsOpen="False" IsLightDismissEnabled="True" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0 70 100 0" >
+                <!-- Grid de fondo que ocupa toda la Page -->
+                <Grid Background="{StaticResource CardBackground}" Padding="20" CornerRadius="8" >
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <StackPanel Grid.Row="0" Spacing="60" Orientation="Horizontal"  Padding="0 10 0 20" VerticalAlignment="Center">
+                        <TextBlock Text="Formulario para editar facturas" FontSize="16" VerticalAlignment="Center"
+                                HorizontalAlignment="Center"/>
+                        <Button Content="Cerrar" Click="ClosePopupClicked" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <ScrollViewer Grid.Row="1" Height="300">
+                        <StackPanel HorizontalAlignment="Stretch" Orientation="Vertical" Spacing="20">
+                            <TextBox PlaceholderText="Invoice ID"/>
+                            <TextBox PlaceholderText="STNO"/>
+                            <TextBox PlaceholderText="BOSFX"/>
+                            <TextBox PlaceholderText="SLSTYP"/>
+                            <TextBox PlaceholderText="ENDT8"/>
+                            <ComboBox PlaceholderText="DOCSU">
+                                <x:String>Awating</x:String>
+                                <x:String>Invoice</x:String>
+                            </ComboBox>
+                            <TextBox PlaceholderText="RFDCNO"/>
+                            <TextBox PlaceholderText="LNNO"/>
+                            <TextBox PlaceholderText="SOS1"/>
+                            <TextBox PlaceholderText="PAN030"/>
+                            <TextBox PlaceholderText="DS18"/>
+                            <TextBox PlaceholderText="QRQY"/>
+                            <TextBox PlaceholderText="BOIMCT"/>
+                            <TextBox PlaceholderText="SPQTY"/>
+                            <TextBox PlaceholderText="TRXCD"/>
+                            <TextBox PlaceholderText="UNCS"/>
+                            <TextBox PlaceholderText="UNLS"/>
+                            <TextBox PlaceholderText="WTUM"/>
+                            <TextBox PlaceholderText="CUNM"/>
+                            <TextBox PlaceholderText="SPVIDS"/>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <StackPanel HorizontalAlignment="Stretch" Grid.Row="2" Padding="0 10 0 10">
+                        <Button HorizontalAlignment="Stretch" Content="Modificar" Click="ModificarBtn"/>
+                    </StackPanel>
+                </Grid>
+            </Popup>
+
         </Grid>
+
+
+ 
+
+
+        <InfoBar
+            Grid.Row="0"
+            x:Name="infoBar"
+            IsOpen="False"
+        />
+        
         <!-- Overlay de carga -->
-        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="loadingOverlay" Background="#80000000" Visibility="Collapsed" Canvas.ZIndex="10">
+        <Grid Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="loadingOverlay" Background="#80000000" Visibility="Collapsed" Canvas.ZIndex="10">
             <ProgressRing Width="60" Height="60" IsActive="True"/>
         </Grid>
+        
     </Grid>
 
 </Page>

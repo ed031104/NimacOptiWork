@@ -19,10 +19,12 @@ namespace Application.Services.Generic
             _repository = repository;
         }
 
-        public Task<IEnumerable<TDomain>> GetAllAsync() => _repository.GetAllAsync();
-        public Task<TDomain?> GetByIdAsync(int id) => _repository.GetByIdAsync(id);
-        public System.Threading.Tasks.Task AddAsync(TDomain entity) => _repository.AddAsync(entity);
-        public System.Threading.Tasks.Task UpdateAsync(TDomain entity) => _repository.UpdateAsync(entity);
-        public System.Threading.Tasks.Task DeleteAsync(int id) => _repository.DeleteAsync(id);
+        public async Task<IEnumerable<TDomain>> GetAllAsync() => await _repository.GetAllAsync();
+        public async Task<TDomain?> GetByIdAsync(int id) => await _repository.GetByIdAsync(id);
+        public async Task AddAsync(TDomain entity) => await _repository.AddAsync(entity);
+        public async Task UpdateAsync(TDomain entity) => await _repository.UpdateAsync(entity);
+        public async Task DeleteAsync(int id) => await _repository.DeleteAsync(id);
+        public async Task<IEnumerable<TDomain>> GetAllAsync(int pageNumber, int pageSize) => await _repository.GetAllAsync(pageNumber, pageSize);
+        public async Task<int> Count() => await _repository.Count();
     }
 }

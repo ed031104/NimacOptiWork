@@ -12,9 +12,12 @@ namespace Domain.Interfaces.Services
         where TEntity : class
     {
         Task<IEnumerable<TDomain>> GetAllAsync();
+        Task<IEnumerable<TDomain>> GetAllAsync(int pageNumber, int pageSize);
         Task<TDomain?> GetByIdAsync(int id);
         System.Threading.Tasks.Task AddAsync(TDomain entity);
         System.Threading.Tasks.Task UpdateAsync(TDomain entity);
         System.Threading.Tasks.Task DeleteAsync(int id);
+        Task<int> Count();
+
     }
 }

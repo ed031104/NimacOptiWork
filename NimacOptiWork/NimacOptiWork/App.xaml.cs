@@ -61,6 +61,8 @@ namespace NimacOptiWork
                    services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
                    services.AddTransient(typeof(IRepository<,>), typeof(GenericRepository<,>));
                    services.AddScoped(typeof(IServices<,>), typeof(ServicesGeneric<,>));
+                   services.AddScoped<IRepositoryTask, RepositoryTask>();
+                   services.AddScoped<IServicesTask, ServicesTask>();
                })
                .Build();
         }

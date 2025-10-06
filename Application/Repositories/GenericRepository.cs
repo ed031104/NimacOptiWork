@@ -20,7 +20,7 @@ namespace Infraestructure.Repositories
 
         public GenericRepository(NimacOptiWorkContext dbContext, IMapper mapper) {
             this.dbContext = dbContext;
-            this._mapper = mapper;
+            _mapper = mapper;
         }
 
         
@@ -28,6 +28,11 @@ namespace Infraestructure.Repositories
         {
             await dbContext.AddAsync(entity);
             await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<int> Count()
+        {
+            return await dbContext.Set<TEntity>().CountAsync();
         }
 
         public async Task DeleteAsync(int id)
@@ -42,11 +47,19 @@ namespace Infraestructure.Repositories
             return _mapper.Map<IEnumerable<TDomain>>(entities);
         }
 
+        public async Task<IEnumerable<TDomain>> GetAllAsync(int pageNumber, int pageSize)
+        {
+            var entities = await dbContext.Set<TEntity>()
+                .Skip((pageNumber) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return _mapper.Map<IEnumerable<TDomain>>(entities);
+        }
+
         public async Task<TDomain?> GetByIdAsync(int id)
         {
             return await dbContext.Set<TDomain>().FindAsync(id);
         }
-
         
         public async Task UpdateAsync(TDomain entity)
         {
