@@ -15,17 +15,20 @@ public partial class Task
 
     public string Createdby { get; set; } = null!;
 
+    public string? TaskCode { get; set; }
+
     #region Constructors
     public Task()
     {
     }
-    public Task(int taskId, string invoiceNumber, string description, DateTime createdDate, string createdby)
+    public Task(int taskId, string invoiceNumber, string description, DateTime createdDate, string createdby, string? taskCode)
     {
         TaskId = taskId;
         InvoiceNumber = invoiceNumber;
         Description = description;
         CreatedDate = createdDate;
         Createdby = createdby;
+        TaskCode = taskCode;
     }
     #endregion
 
@@ -60,6 +63,11 @@ public partial class Task
         public Builder WithCreatedby(string createdby)
         {
             _task.Createdby = createdby;
+            return this;
+        }
+        public Builder WithTaskCode(string? taskCode)
+        {
+            _task.TaskCode = taskCode;
             return this;
         }
         public Task Build()

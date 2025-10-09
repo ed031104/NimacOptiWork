@@ -13,9 +13,6 @@ public partial class TaskStatusHistory
     [Column("TaskStatusHistoryID")]
     public int TaskStatusHistoryId { get; set; }
 
-    [Column("TaskID")]
-    public int TaskId { get; set; }
-
     [Column("TaskStateID")]
     public int TaskStateId { get; set; }
 
@@ -25,9 +22,11 @@ public partial class TaskStatusHistory
     [StringLength(50)]
     public string ChangedBy { get; set; } = null!;
 
-    [ForeignKey("TaskId")]
+    public int TaskAssignmentId { get; set; }
+
+    [ForeignKey("TaskAssignmentId")]
     [InverseProperty("TaskStatusHistories")]
-    public virtual Task Task { get; set; } = null!;
+    public virtual TaskAssignment TaskAssignment { get; set; } = null!;
 
     [ForeignKey("TaskStateId")]
     [InverseProperty("TaskStatusHistories")]

@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    xmlns:entities="using:Domain.Models"
+    xmlns:domain="using:Domain.Models"
     >
 
 
@@ -22,6 +22,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
@@ -82,7 +83,11 @@
                     </Button.Flyout>
                 </Button>
             </StackPanel>
-
+            <InfoBar
+                Grid.Row="3"
+                x:Name="infoBar"
+                IsOpen="False"
+            />
         </Grid>
 
         <SplitView x:Name="MainSplitView" Grid.Row="1"  Padding="10 30 20 0" DisplayMode="Overlay" IsPaneOpen="False"  PanePlacement="Right">
@@ -90,11 +95,15 @@
             <!-- Panel lateral -->
             <SplitView.Pane>
 
-                <StackPanel BorderBrush="Gray" CornerRadius="15 0 0 15" BorderThickness="1 1 0 1" Padding="10 0 10 0" HorizontalAlignment="Stretch" >
+                <Grid BorderBrush="Gray" CornerRadius="15 0 0 15" BorderThickness="1 1 0 1" Padding="10 0 10 0" HorizontalAlignment="Stretch" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <TextBlock FontSize="20" Text="Detalles" Padding="0 10 0 30"/>
-
-                    <Grid Padding="10,0,10,0" ColumnSpacing="10" Width="Auto">
+                    <Grid VerticalAlignment="Center" Padding="5 10 5 20">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <!-- Toma todo el espacio disponible -->
@@ -102,45 +111,38 @@
                             <!-- Se ajusta al contenido -->
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Persona asignada:" VerticalAlignment="Center"/>
 
-                        <!-- DropDownButton al final (derecha) -->
-                        <DropDownButton AutomationProperties.Name="Email" Grid.Column="1">
-                            <DropDownButton.Content>
-                                <StackPanel Orientation="Horizontal" Spacing="10" Padding="10 0 10 0">
-                                    <FontIcon Glyph="&#xE715;"/>
-                                    <TextBlock  Text="Bartolomé"/>
-                                </StackPanel>
-                            </DropDownButton.Content>
-                            <DropDownButton.Flyout>
-                                <MenuFlyout Placement="Bottom">
-                                    <MenuFlyoutItem Text="Juan bartolomé">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE725;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Reply">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE8CA;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Reply All">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE8C2;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                </MenuFlyout>
-                            </DropDownButton.Flyout>
-                        </DropDownButton>
-
+                        <Button VerticalAlignment="Center" Grid.Column="1" Content="Cerrar" Click="ClosePane_Click" IsRightTapEnabled="True"/>
+                        <TextBlock x:Name="tittleAssingmentUser" VerticalAlignment="Center" Grid.Column="0" FontSize="20" Text="Detalles" Padding="0 10 0 30"/>
                     </Grid>
 
+                    <Grid Grid.Row="1" Padding="10,0,10,0" ColumnSpacing="10" Width="Auto">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <!-- Toma todo el espacio disponible -->
+                            <ColumnDefinition Width="Auto"/>
+                            <!-- Se ajusta al contenido -->
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="" FontSize="20" FontWeight="Bold"/>
-                    <TextBlock Text="" TextWrapping="Wrap" Margin="0,10,0,0"/>
-                    <Button Content="Cerrar" Click="ClosePane_Click"/>
+                        <TextBlock Text="Asignar a:" VerticalAlignment="Center"/>
 
-                </StackPanel>
+                        <!-- DropDownButton al final (derecha) -->
+                        <ComboBox Grid.Column="1" x:Name="users"
+                              DisplayMemberPath="Username"
+                              SelectedValuePath="Id"
+                              Width="200"
+                              PlaceholderText="Selecciona un usuario"
+                              KeyTipPlacementMode="Bottom"
+                                  />
+                    </Grid>
+
+                    
+                    
+
+                    <Button Grid.Row="3" Content="Asignar" HorizontalAlignment="Stretch" Margin="3 0 3 10" Click="AsignarUsuario"/>
+ 
+
+                </Grid>
             </SplitView.Pane>
 
             <SplitView.Content>
@@ -181,7 +183,7 @@
                           >
                             <ListView.ItemTemplate>
 
-                                <DataTemplate>
+                                <DataTemplate x:DataType="domain:TaskAssignment">
                                     <Border Tapped="Task_Tapped" Background="{ThemeResource CardBackground}" BorderThickness="1" BorderBrush="LightGray" CornerRadius="5" Padding="10" Margin="0,0,0,10">
                                         <StackPanel>
                                             <Grid>
@@ -211,17 +213,17 @@
                                                 </Grid>
                                                 <!--Data Task-->
                                                 <StackPanel Padding="0 0 0 15" Grid.Row="1" Orientation="Horizontal" Spacing="10">
-                                                    <TextBlock Foreground="{ThemeResource ForegroundSecond}" FontSize="12" Text="TSK-002" FontWeight="SemiBold"/>
+                                                    <TextBlock Foreground="{ThemeResource ForegroundSecond}" FontSize="12" Text="{Binding Task.TaskCode}" FontWeight="SemiBold"/>
                                                     <StackPanel Orientation="Horizontal">
                                                         <FontIcon Foreground="{ThemeResource ForegroundSecond}" FontSize="12" Glyph="&#xE823;" />
                                                         <!--Fecha Creacion-->
-                                                        <TextBlock Foreground="{ThemeResource ForegroundSecond}" FontSize="12" Text="{Binding CreatedDate}"/>
+                                                        <TextBlock Foreground="{ThemeResource ForegroundSecond}" FontSize="12" Text="{Binding Task.CreatedDate}"/>
                                                     </StackPanel>
                                                 </StackPanel>
 
                                                 <!--Description Task-->
                                                 <StackPanel Padding="0 0 0 15" Grid.Row="2" Orientation="Horizontal">
-                                                    <TextBlock TextWrapping="Wrap" MaxWidth="1000" Text="{Binding Description}" FontWeight="SemiBold"/>
+                                                    <TextBlock TextWrapping="Wrap" MaxWidth="1000" Text="{Binding Task.Description}" FontWeight="SemiBold"/>
                                                 </StackPanel>
 
                                                 <!--Footer Task-->
@@ -234,14 +236,14 @@
 
                                                     <StackPanel Spacing="10" Orientation="Horizontal">
                                                         <PersonPicture 
-                                                 VerticalAlignment="Center"
-                                               DisplayName="S/A"
-                                               Width="32"
-                                               Height="32"/>
+                                                             VerticalAlignment="Center"
+                                                           DisplayName="{Binding AssignedTo.Username}"
+                                                           Width="32"
+                                                           Height="32"/>
                                                         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                                                             <TextBlock
                                                                  FontSize="13"
-                                                               Text="Sin asignar"
+                                                               Text="{Binding AssignedTo.Username}"
                                                                VerticalAlignment="Center"
                                                                Foreground="{ThemeResource ForegroundSecond}"/>
                                                             <TextBlock FontSize="12" Text="..." Foreground="{ThemeResource ForegroundSecond}"/>
@@ -250,7 +252,7 @@
 
                                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Spacing="5" Grid.Column="2">
                                                         <FontIcon Foreground="{ThemeResource ForegroundSecond}" Glyph="&#xE8A5;" FontSize="12"/>
-                                                        <TextBlock Text="{Binding InvoiceNumber}" FontSize="12" Foreground="{ThemeResource ForegroundSecond}"/>
+                                                        <TextBlock Text="{Binding Task.InvoiceNumber}" FontSize="12" Foreground="{ThemeResource ForegroundSecond}"/>
                                                     </StackPanel>
                                                 </Grid>
                                             </Grid>

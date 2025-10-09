@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Infraestructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Context;
+namespace Infraestructure.Context;
 
 public partial class NimacOptiWorkContext : DbContext
 {
@@ -20,7 +20,7 @@ public partial class NimacOptiWorkContext : DbContext
 
     public virtual DbSet<Rol> Rols { get; set; }
 
-    public virtual DbSet<Infraestructure.Entities.Task> Tasks { get; set; }
+    public virtual DbSet<Entities.Task> Tasks { get; set; }
 
     public virtual DbSet<TaskAssignment> TaskAssignments { get; set; }
 
@@ -32,9 +32,7 @@ public partial class NimacOptiWorkContext : DbContext
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //    => optionsBuilder.UseSqlServer("Server=.;Database=NimacOptiWork;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True;");
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Invoice>(entity =>
@@ -54,11 +52,12 @@ public partial class NimacOptiWorkContext : DbContext
             entity.Property(e => e.DateModified).HasDefaultValueSql("(getdate())");
         });
 
-        modelBuilder.Entity<Infraestructure.Entities.Task>(entity =>
+        modelBuilder.Entity<Entities.Task>(entity =>
         {
             entity.HasKey(e => e.TaskId).HasName("PK__Task__7C6949D1DEFEA7B5");
 
             entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.TaskCode).HasComputedColumnSql("('TSK-'+right('000'+CONVERT([varchar](3),[TaskId]),(3)))", true);
         });
 
         modelBuilder.Entity<TaskAssignment>(entity =>
@@ -87,9 +86,9 @@ public partial class NimacOptiWorkContext : DbContext
 
             entity.Property(e => e.ChangedDate).HasDefaultValueSql("(getdate())");
 
-            entity.HasOne(d => d.Task).WithMany(p => p.TaskStatusHistories)
+            entity.HasOne(d => d.TaskAssignment).WithMany(p => p.TaskStatusHistories)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__TaskStatu__TaskI__7B5B524B");
+                .HasConstraintName("FK__TaskStatu__TaskA__01142BA1");
 
             entity.HasOne(d => d.TaskState).WithMany(p => p.TaskStatusHistories)
                 .OnDelete(DeleteBehavior.ClientSetNull)

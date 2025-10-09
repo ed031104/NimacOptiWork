@@ -1,4 +1,4 @@
-﻿using Application.Context;
+﻿using Infraestructure.Context;
 using AutoMapper;
 using Domain.Enums;
 using Domain.Interfaces.Repositories;
@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Models;
 
 namespace Infraestructure.Repositories
 {
@@ -15,39 +16,50 @@ namespace Infraestructure.Repositories
     {
         private readonly NimacOptiWorkContext _context;
         private readonly IMapper _mapper;
+        private readonly UserSession _userSession;
 
-        public RepositoryTask(NimacOptiWorkContext context, IMapper mapper)
+        public RepositoryTask(NimacOptiWorkContext context, IMapper mapper, UserSession userSession)
         {
             _context = context;
             _mapper = mapper;
+            _userSession = userSession;
         }
 
+        // funciona
         public async System.Threading.Tasks.Task addTaskAsync(Domain.Models.Task task)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-
-                // Map the Domain.Models.Task to Infraestructure.Entities.Task
                 Entities.Task entityTask = _mapper.Map<Infraestructure.Entities.Task>(task);
                 await _context.Tasks.AddAsync(entityTask);
                 await _context.SaveChangesAsync();
 
-                // add status created in history
-
-                var taskStateHistory = new Entities.TaskStatusHistory
+                // Crear una asignación de tarea inicial sin usuario asignado
+                var taskAssignment = new Entities.TaskAssignment
                 {
                     Task = entityTask,
-                    TaskId = entityTask.TaskId,
-                    TaskStateId = (int)StatusTaskE.ALAESPERA,
-                    ChangedDate = DateTime.Now,
-                    ChangedBy = "system"
+                    AssignedTo = null, // No asignado inicialmente
+                    AssignedDate = DateTime.Now
                 };
 
-                await _context.TaskStatusHistories.AddAsync(taskStateHistory);
+                await _context.TaskAssignments.AddAsync(taskAssignment);
                 await _context.SaveChangesAsync();
 
-                await _context.Database.CommitTransactionAsync();
+                // Crear un historial de estado inicial para la tarea
+                var taskStatusHistory = new Entities.TaskStatusHistory
+                {
+                    TaskAssignment = taskAssignment,
+                    TaskAssignmentId = taskAssignment.TaskAssignmentId,
+                    TaskStateId = (int)StatusTaskE.ALAESPERA, // Estado inicial
+                    ChangedDate = DateTime.Now,
+                    ChangedBy = _userSession.UserName
+                };
+
+                await _context.TaskStatusHistories.AddAsync(taskStatusHistory);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
             }
             catch (Exception ex)
             {
@@ -60,27 +72,16 @@ namespace Infraestructure.Repositories
         {
             try
             {
-                var task = await _context.Tasks.FindAsync(idTask);
-                if (task == null)
-                {
-                    throw new Exception("Task not found");
-                }
+                //actualizar el campo user id en la tabla task assignment
+                var taskAssignment = await _context.TaskAssignments
+                    .FirstOrDefaultAsync(t => t.TaskAssignmentId == idTask);
 
-                var user = await _context.Users.FindAsync(idUser);
+                if (taskAssignment == null)
+                    return;
 
-                if (user == null)
-                {
-                    throw new Exception("User not found");
-                }
-
-                var assignment = new Entities.TaskAssignment
-                {
-                    Task = task,
-                    AssignedTo = user.Id,
-                    AssignedDate = DateTime.Now
-                };
-
-                await _context.TaskAssignments.AddAsync(assignment);
+                taskAssignment.AssignedTo = idUser;
+                taskAssignment.AssignedDate = DateTime.Now;
+                _context.TaskAssignments.Update(taskAssignment);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -169,17 +170,17 @@ namespace Infraestructure.Repositories
             }
         }
 
-        public Task<Domain.Models.Task> getTaskByTitle(string title)
+        public async Task<Domain.Models.Task> getTaskByTitle(string title)
         {
             try
             {
-                var task = _context.Tasks.FirstOrDefault(t => t.Description == title);
+                var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Description == title);
                 if (task == null)
                 {
                     throw new Exception("Task not found");
                 }
                 var domainTask = _mapper.Map<Domain.Models.Task>(task);
-                return Task.FromResult(domainTask);
+                return domainTask;
             }
             catch (Exception ex)
             {
@@ -204,24 +205,46 @@ namespace Infraestructure.Repositories
             }
         }
 
-        public Task<IEnumerable<Domain.Models.Task>> getTasksByStatusAsync(int idStatus)
+        public async Task<IEnumerable<Domain.Models.TaskAssignment>> getTasksByStatusAsync(int idStatus)
         {
             try
             {
+                var domainTasks = await _context.TaskAssignments
+                    .Where(ta => ta.TaskStatusHistories.Any(tsh => tsh.TaskStateId == idStatus))
+                    .Include(ta => ta.Task)
+                    .Include(ta => ta.AssignedToNavigation)
+                    .Select(ta => new Domain.Models.TaskAssignment
+                    {
+                        TaskAssignmentId = ta.TaskAssignmentId,
+                        AssignedDate = ta.AssignedDate,
+                        DateStarted = ta.DateStarted,
+                        DateCompleted = ta.DateCompleted,
+                        TimeEstimatedStart = ta.TimeEstimatedStart,
+                        TimeEstimatedEnd = ta.TimeEstimatedEnd,
+                        Task = ta.Task != null ? new Domain.Models.Task
+                        {
+                            TaskId = ta.Task.TaskId,
+                            Createdby = ta.Task.Createdby,
+                            CreatedDate = ta.Task.CreatedDate,
+                            Description = ta.Task.Description,
+                            InvoiceNumber = ta.Task.InvoiceNumber,
+                            TaskCode = ta.Task.TaskCode
+                        } : null,
+                        AssignedTo = ta.AssignedToNavigation != null ? new Domain.Models.User
+                        {
+                            Id = ta.AssignedToNavigation.Id,
+                            Username = ta.AssignedToNavigation.Username,
+                            Password = ta.AssignedToNavigation.Password,
+                            Email = ta.AssignedToNavigation.Email,
+                            Active = ta.AssignedToNavigation.Active,
+                            DateCreated = ta.AssignedToNavigation.DateCreated,
+                            DateModified = ta.AssignedToNavigation.DateModified
+                        } : null
+                    })
+                    .ToListAsync();
 
-                var tasks = _context.TaskStatusHistories
-                    .Where(tsh => tsh.TaskStateId == idStatus)
-                    .Select(tsh => tsh.Task)
-                    .Distinct() // Ensure distinct tasks if multiple status entries exist
-                    .ToList();
+                return domainTasks;
 
-                if (tasks == null || !tasks.Any())
-                {
-                    throw new Exception("No tasks found with the specified status");
-                }
-
-                var domainTasks = _mapper.Map<IEnumerable<Domain.Models.Task>>(tasks);
-                return Task.FromResult(domainTasks);
             }
             catch (Exception ex)
             {
@@ -233,14 +256,15 @@ namespace Infraestructure.Repositories
         {
             try
             {
-                var task = _context.Tasks.Find(idTask);
+                var task = _context.TaskAssignments.Find(idTask);
                 if (task == null)
                 {
                     throw new Exception("Task not found");
                 }
                 var taskStateHistory = new Entities.TaskStatusHistory
                 {
-                    Task = task,
+                    TaskAssignment = task,
+                    TaskAssignmentId = task.TaskAssignmentId,
                     TaskStateId = (int)state,
                     ChangedDate = DateTime.Now
                 };

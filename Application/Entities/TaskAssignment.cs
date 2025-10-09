@@ -16,7 +16,7 @@ public partial class TaskAssignment
     [Column("TaskID")]
     public int TaskId { get; set; }
 
-    public int AssignedTo { get; set; }
+    public int? AssignedTo { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime AssignedDate { get; set; }
@@ -40,4 +40,7 @@ public partial class TaskAssignment
     [ForeignKey("TaskId")]
     [InverseProperty("TaskAssignments")]
     public virtual Task Task { get; set; } = null!;
+
+    [InverseProperty("TaskAssignment")]
+    public virtual ICollection<TaskStatusHistory> TaskStatusHistories { get; set; } = new List<TaskStatusHistory>();
 }

@@ -1,18 +1,16 @@
-﻿using Domain.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Interfaces.Repositories
+namespace Domain.Interfaces.Services
 {
-    public interface IRepositoryLogin
+    public interface IServicesLogin
     {
         Task<bool> ValidateCredentialAsync(string username, string password);
         Task<bool> ValidatePasswordAsync(string username, string oldPassword, string newPassword);
         Task<bool> ChangePasswordAsync(string username, string newPassword);
         Task<bool> ValidateEmailAsync(string email);
-        Task<UserRole> getRoleUser(string username);
     }
 }

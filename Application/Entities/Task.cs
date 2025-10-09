@@ -26,9 +26,10 @@ public partial class Task
     [StringLength(50)]
     public string Createdby { get; set; } = null!;
 
-    [InverseProperty("Task")]
-    public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
+    [StringLength(7)]
+    [Unicode(false)]
+    public string? TaskCode { get; set; }
 
     [InverseProperty("Task")]
-    public virtual ICollection<TaskStatusHistory> TaskStatusHistories { get; set; } = new List<TaskStatusHistory>();
+    public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
 }

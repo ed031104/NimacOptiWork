@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using Domain.Interfaces.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -10,22 +7,25 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace NimacOptiWork
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainWindow : Window
     {
+
+        IServicesLogin _servicesLogin;
+
         public MainWindow()
         {
             InitializeComponent();
+            _servicesLogin = App.AppHost.Services.GetRequiredService<IServicesLogin>();
         }
 
 
@@ -33,7 +33,13 @@ namespace NimacOptiWork
         {
             loadingOverlay.Visibility = Visibility.Visible;
 
-            if (!email.Text.Equals("admin") && !password.Password.Equals("admin123"))
+            var credentials = (username: string.Empty, password: string.Empty);
+            credentials.username = email.Text.Trim();
+            credentials.password = password.Password.Trim();
+
+            bool isloginValid = await _servicesLogin.ValidateCredentialAsync(credentials.username, credentials.password);
+
+            if (!isloginValid)
             {
                 infoBar.IsOpen = true;
                 infoBar.Title = "Error";
@@ -45,8 +51,6 @@ namespace NimacOptiWork
                 loadingOverlay.Visibility = Visibility.Collapsed;
                 return;
             }
-
-            await System.Threading.Tasks.Task.Delay(2000);
 
             loadingOverlay.Visibility = Visibility.Collapsed;
 

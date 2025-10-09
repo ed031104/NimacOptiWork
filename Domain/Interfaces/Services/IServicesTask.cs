@@ -16,7 +16,7 @@ namespace Domain.Interfaces.Services
         System.Threading.Tasks.Task updateTaskAsync(Domain.Models.Task task);
         System.Threading.Tasks.Task deleteTaskAsync(int id);
 
-        Task<IEnumerable<Domain.Models.Task>> getTasksByStatusAsync(int idStatus);
+        Task<IEnumerable<Domain.Models.TaskAssignment>> getTasksByStatusAsync(int idStatus);
         System.Threading.Tasks.Task updateStatusTaskAsync(int idTask, int idStatus);
 
         Task<int> Count();

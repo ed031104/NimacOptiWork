@@ -38,11 +38,11 @@
                   Spacing="10"
               >
                     <TextBlock 
-                      Text="Usuario: Juan Pérez - Administrador"
+                      Text="{x:Bind userSession.UserName}"
                       VerticalAlignment="Center"
                       Foreground="White"/>
                     <PersonPicture 
-                      DisplayName="Juan Pérez"
+                      DisplayName="{x:Bind userSession.UserName}"
                       Width="32"
                       Height="32"
                   />

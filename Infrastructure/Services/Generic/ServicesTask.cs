@@ -26,9 +26,9 @@ namespace Application.Services.Generic
             await repositoryTask.addTaskAsync(task);
         }
 
-        public System.Threading.Tasks.Task assignTaskToUserAsync(int idTask, int idUser)
+        public async System.Threading.Tasks.Task assignTaskToUserAsync(int idTask, int idUser)
         {
-            throw new NotImplementedException();
+            await repositoryTask.assignTaskToUserAsync(idTask, idUser);
         }
 
         public Task<int> Count()
@@ -71,8 +71,10 @@ namespace Application.Services.Generic
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Domain.Models.Task>> getTasksByStatusAsync(int idStatus)
+        public async Task<IEnumerable<Domain.Models.TaskAssignment>> getTasksByStatusAsync(int idStatus)
         {
+            if (idStatus <= 0 || idStatus == null)  return null!;
+
             var task = await repositoryTask.getTasksByStatusAsync(idStatus);
             return task;
         }

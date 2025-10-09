@@ -1,3 +1,7 @@
+using Domain.Interfaces.Services;
+using Domain.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -14,22 +18,22 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace NimacOptiWork
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class Menu : Window
     {
+
+        UserSession userSession;
+
         public Menu()
         {
             InitializeComponent();
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(SimpleTitleBar); // Set the custom title bar element
+            
+            userSession = App.AppHost.Services.GetRequiredService<UserSession>();
         }
 
         private void navView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
