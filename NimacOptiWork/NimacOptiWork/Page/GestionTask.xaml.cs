@@ -5,30 +5,24 @@ using Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
+using NimacOptiWork.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
 
 namespace NimacOptiWork.Page
 {
     public sealed partial class GestionTask : Microsoft.UI.Xaml.Controls.Page
     {
-        public ObservableCollection<Domain.Models.TaskAssignment> ListTask { get; set; } = new();
+        private Dictionary<userRole, List<string>> _permissionsUser;
+
+        public ObservableCollection<Domain.Models.TaskStatusHistory> ListTask { get; set; } = new();
+        private ObservableCollection<string> _invoices = new();
         private string codeFacturaSelected = string.Empty;
-        private TaskAssignment? _taskSelected;
-        public TaskAssignment? TaskSelected
+        private TaskStatusHistory? _taskSelected;
+        public TaskStatusHistory? TaskSelected
         {
             get => _taskSelected;
             set
@@ -40,7 +34,7 @@ namespace NimacOptiWork.Page
         private readonly IServicesTask _invoiceService;
         private readonly IServices<Domain.Models.User, Infraestructure.Entities.User> _userService;
 
-        UserSession _userSession;
+        private UserSession _userSession;
 
         public GestionTask()
         {
@@ -48,13 +42,17 @@ namespace NimacOptiWork.Page
             _invoiceService = App.AppHost.Services.GetRequiredService<IServicesTask>();
             _userService = App.AppHost.Services.GetRequiredService<IServices<User, Infraestructure.Entities.User>>();
             _userSession = App.AppHost.Services.GetRequiredService<UserSession>();
+            
+            _permissionsUser = new Dictionary<userRole, List<string>> {{ userRole.administrador, new List<string> { "OpenPaneButton" } },};
         }
 
         protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            await validateRole();
             await loadingTasksAsync();
             await loadUsersComboBox();
+            await loadInvoices();
         }
 
         private async void crearTaskBtn(object sender, RoutedEventArgs e)
@@ -86,13 +84,13 @@ namespace NimacOptiWork.Page
                 return;
             }
 
-            await _invoiceService.assignTaskToUserAsync(taskAssignmentId.TaskAssignmentId, userSelected.Id);
+            await _invoiceService.assignTaskToUserAsync(taskAssignmentId.TaskAssignment.TaskAssignmentId, userSelected.Id);
             MainSplitView.IsPaneOpen = false;
             _taskSelected = null;
 
-            await showInfobar("Asignación exitosa", "La tarea ha sido asignada correctamente.", InfoBarSeverity.Success);
-
             await loadingTasksAsync();
+
+            await showInfobar("Asignación exitosa", "La tarea ha sido asignada correctamente.", InfoBarSeverity.Success);
         }
 
         // método para el autosuggest de facturas
@@ -100,8 +98,15 @@ namespace NimacOptiWork.Page
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                var suggestions = await _invoiceService.getCodeFactura();
-                sender.ItemsSource = suggestions;
+                if(string.IsNullOrEmpty(sender.Text))
+                {
+                    await loadInvoices();
+                    return;
+                }
+                var filteredInvoices = _invoices.Select(_invoices => _invoices.ToLower())
+                                                .Where(factura => factura.Contains(sender.Text.ToLower()))
+                                                .ToList();
+                sender.ItemsSource = filteredInvoices;
             }
         }
 
@@ -122,6 +127,26 @@ namespace NimacOptiWork.Page
         }
 
         #region others methods
+        
+        private async System.Threading.Tasks.Task loadInvoices()
+        {
+            var invoicesFromDb = await _invoiceService.getCodeFactura();
+            facturaAutoSuggest.ItemsSource = invoicesFromDb;
+
+            foreach (var invoice in invoicesFromDb)
+            {
+                _invoices.Add(invoice);
+            }
+        }
+        private async System.Threading.Tasks.Task validateRole()
+        {
+            if (_userSession.IdRole == null || Content is not FrameworkElement frameworkElement)
+                return;
+
+            var role = (userRole)_userSession.IdRole;
+            UIHelpers.ApplyRoleUI(frameworkElement, role, _permissionsUser);
+        }
+
         private void ClosePane_Click(object sender, RoutedEventArgs e)
         {
             MainSplitView.IsPaneOpen = false;
@@ -130,9 +155,9 @@ namespace NimacOptiWork.Page
 
         private void Task_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if (sender is FrameworkElement element && element.DataContext is Domain.Models.TaskAssignment taskAssignment)
+            if (sender is FrameworkElement element && element.DataContext is Domain.Models.TaskStatusHistory taskAssignment)
             {
-                tittleAssingmentUser.Text = "Detalles de " + taskAssignment.Task.TaskCode;
+                tittleAssingmentUser.Text = "Detalles de " + taskAssignment.TaskAssignment.Task.TaskCode;
                 TaskSelected = taskAssignment;
             }
 
@@ -147,9 +172,20 @@ namespace NimacOptiWork.Page
 
         private async System.Threading.Tasks.Task loadingTasksAsync()
         {
-            var tasksFromDb = await _invoiceService.getTasksByStatusAsync((int)StatusTaskE.ALAESPERA);
+            var tasksFromDb = await _invoiceService.getUnassignedTasks();
+
+            if (!tasksFromDb.Status)
+            { 
+                infoBar.Title = "Error al cargar las tareas";
+                infoBar.Message = tasksFromDb.Message;
+                infoBar.Severity = InfoBarSeverity.Error;
+                
+                ListTask.Clear();
+                return;
+            }
+
             ListTask.Clear();
-            foreach (var task in tasksFromDb)
+            foreach (var task in tasksFromDb.Data)
             {
                 ListTask.Add(task);
             }

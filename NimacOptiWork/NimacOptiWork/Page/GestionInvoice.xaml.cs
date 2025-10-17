@@ -15,7 +15,7 @@ namespace NimacOptiWork.Page;
 public sealed partial class GestionInvoice : Microsoft.UI.Xaml.Controls.Page
 {
     // Inyeccion de dependencias
-    private readonly IServices<Invoice, Infraestructure.Entities.Invoice> _invoiceService;
+    private readonly IServicesInvoice _invoiceService;
 
     // Coleccion observable para enlazar con el DataGrid
     ObservableCollection<Invoice> invoicesFromDb = new ObservableCollection<Invoice>();
@@ -26,7 +26,7 @@ public sealed partial class GestionInvoice : Microsoft.UI.Xaml.Controls.Page
     public GestionInvoice()
     {
         InitializeComponent();
-        _invoiceService = App.AppHost.Services.GetRequiredService<IServices<Invoice, Infraestructure.Entities.Invoice>>();
+        _invoiceService = App.AppHost.Services.GetRequiredService<IServicesInvoice>();
     }
 
     protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
@@ -96,7 +96,7 @@ public sealed partial class GestionInvoice : Microsoft.UI.Xaml.Controls.Page
 
     private async System.Threading.Tasks.Task loadDataGrid(int pageIndex)
     {
-        _invoices = (await _invoiceService.GetAllAsync(pageIndex, itemsPerPage)).ToList();
+        _invoices = (await _invoiceService.GetAllInvoicesAsync(pageIndex, itemsPerPage)).ToList();
         invoicesFromDb.Clear();
         dataGridInvoices.ItemsSource = _invoices;
     }

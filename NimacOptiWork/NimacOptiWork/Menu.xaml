@@ -61,15 +61,15 @@
 
             <!--Elementos del menu-->
             <NavigationView.MenuItems>
-                <NavigationViewItem Content="Dashboard" Tag="dashboard">
+                <NavigationViewItem x:Name="buttonDashboard" Content="Dashboard" Tag="dashboard">
                     <NavigationViewItem.Icon>
                         <BitmapIcon UriSource="https://img.icons8.com/material-outlined/24/dashboard-layout.png"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Gestión de usuarios" Icon="OtherUser" Tag="Gestión de usuarios"/>
-                <NavigationViewItem Content="Gestión de tareas" Icon="Setting" Tag="Gestión de tareas"/>
-                <NavigationViewItem Content="Backlog" Icon="Calendar" Tag="Backlog"/>
-                <NavigationViewItem Content="Gestión de actividades" Icon="AllApps" Tag="Gestión de actividades"/>
+                <NavigationViewItem x:Name="buttonGestionUsers" Content="Gestión de usuarios" Icon="OtherUser" Tag="Gestión de usuarios"/>
+                <NavigationViewItem x:Name="buttonGestionTask" Content="Gestión de tareas" Icon="Setting" Tag="Gestión de tareas"/>
+                <NavigationViewItem x:Name="buttonBacklog" Content="Backlog" Icon="Calendar" Tag="Backlog"/>
+                <NavigationViewItem x:Name="buttonGestionActivity" Content="Recolección de documentos" Icon="AllApps" Tag="Gestión de actividades"/>
             </NavigationView.MenuItems>
 
             <!--Contenedor de páginas-->

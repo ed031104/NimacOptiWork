@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain.Enums
 {
-    public enum StatusTaskE
+    public enum userRole
     {
-        ALAESPERA = 1,
-        ENPROGRESO = 2,
-        COMPLETADA = 3,
-        CANCELADA = 4,
-        CREADO = 5
+        administrador = 1,
+        almacenista = 2
     }
 }

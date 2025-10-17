@@ -41,6 +41,7 @@
 
             <StackPanel Grid.Column="2" VerticalAlignment="Center">
                 <Button
+                    x:Name="OpenPaneButton"
                     Background="#1549e6"
                     Foreground="White"
                     Padding="10 5 10 5"
@@ -183,7 +184,7 @@
                           >
                             <ListView.ItemTemplate>
 
-                                <DataTemplate x:DataType="domain:TaskAssignment">
+                                <DataTemplate x:DataType="domain:TaskStatusHistory">
                                     <Border Tapped="Task_Tapped" Background="{ThemeResource CardBackground}" BorderThickness="1" BorderBrush="LightGray" CornerRadius="5" Padding="10" Margin="0,0,0,10">
                                         <StackPanel>
                                             <Grid>
@@ -208,22 +209,22 @@
                                                     </Border>
                                                     <Border Grid.Column="3" VerticalAlignment="Center" Background="{ThemeResource StatusInForDoing}" Padding="7 2 7 2" CornerRadius="5">
                                                         <!--Estado textBlock-->
-                                                        <TextBlock FontSize="12" Text="A la espera" Foreground="{ThemeResource StatusInForDoingForeground}"/>
+                                                        <TextBlock FontSize="12" Text="Creada" Foreground="{ThemeResource StatusInForDoingForeground}"/>
                                                     </Border>
                                                 </Grid>
                                                 <!--Data Task-->
                                                 <StackPanel Padding="0 0 0 15" Grid.Row="1" Orientation="Horizontal" Spacing="10">
-                                                    <TextBlock Foreground="{ThemeResource ForegroundSecond}" FontSize="12" Text="{Binding Task.TaskCode}" FontWeight="SemiBold"/>
+                                                    <TextBlock Foreground="{ThemeResource ForegroundSecond}" FontSize="12" Text="{Binding TaskAssignment.Task.TaskCode}" FontWeight="SemiBold"/>
                                                     <StackPanel Orientation="Horizontal">
                                                         <FontIcon Foreground="{ThemeResource ForegroundSecond}" FontSize="12" Glyph="&#xE823;" />
                                                         <!--Fecha Creacion-->
-                                                        <TextBlock Foreground="{ThemeResource ForegroundSecond}" FontSize="12" Text="{Binding Task.CreatedDate}"/>
+                                                        <TextBlock Foreground="{ThemeResource ForegroundSecond}" FontSize="12" Text="{Binding TaskAssignment.Task.CreatedDate}"/>
                                                     </StackPanel>
                                                 </StackPanel>
 
                                                 <!--Description Task-->
                                                 <StackPanel Padding="0 0 0 15" Grid.Row="2" Orientation="Horizontal">
-                                                    <TextBlock TextWrapping="Wrap" MaxWidth="1000" Text="{Binding Task.Description}" FontWeight="SemiBold"/>
+                                                    <TextBlock TextWrapping="Wrap" MaxWidth="1000" Text="{Binding TaskAssignment.Task.Description}" FontWeight="SemiBold"/>
                                                 </StackPanel>
 
                                                 <!--Footer Task-->
@@ -237,22 +238,22 @@
                                                     <StackPanel Spacing="10" Orientation="Horizontal">
                                                         <PersonPicture 
                                                              VerticalAlignment="Center"
-                                                           DisplayName="{Binding AssignedTo.Username}"
+                                                           DisplayName="{Binding  TaskAssignment.AssignedTo.Username}"
                                                            Width="32"
                                                            Height="32"/>
                                                         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                                                             <TextBlock
                                                                  FontSize="13"
-                                                               Text="{Binding AssignedTo.Username}"
+                                                               Text="{Binding TaskAssignment.AssignedTo.Username}"
                                                                VerticalAlignment="Center"
                                                                Foreground="{ThemeResource ForegroundSecond}"/>
-                                                            <TextBlock FontSize="12" Text="..." Foreground="{ThemeResource ForegroundSecond}"/>
+                                                            <TextBlock FontSize="12" Text="{Binding TaskAssignment.AssignedTo.Username}" Foreground="{ThemeResource ForegroundSecond}"/>
                                                         </StackPanel>
                                                     </StackPanel>
 
                                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Spacing="5" Grid.Column="2">
                                                         <FontIcon Foreground="{ThemeResource ForegroundSecond}" Glyph="&#xE8A5;" FontSize="12"/>
-                                                        <TextBlock Text="{Binding Task.InvoiceNumber}" FontSize="12" Foreground="{ThemeResource ForegroundSecond}"/>
+                                                        <TextBlock Text="{Binding TaskAssignment.Task.InvoiceNumber}" FontSize="12" Foreground="{ThemeResource ForegroundSecond}"/>
                                                     </StackPanel>
                                                 </Grid>
                                             </Grid>

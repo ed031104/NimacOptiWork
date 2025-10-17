@@ -5,6 +5,7 @@ using Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,6 +31,7 @@ namespace Application.Services.Generic
         {
             await repositoryTask.assignTaskToUserAsync(idTask, idUser);
         }
+
 
         public Task<int> Count()
         {
@@ -66,16 +68,39 @@ namespace Application.Services.Generic
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TaskAssignment>> getTaskByUserAssigned(int idUser)
+        public async Task<Response<IEnumerable<TaskStatusHistory>>> getTaskByUserAssigned(int idUser)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var task = await repositoryTask.getTaskByUserAssigned(idUser);
+
+                if(!task.Status)
+                {
+                    return Response<IEnumerable<TaskStatusHistory>>.Failure(task.Message);
+                }
+
+                return Response<IEnumerable<TaskStatusHistory>>.Success(task.Data, task.Message);   
+            }
+            catch (Exception ex)
+            {
+                return Response<IEnumerable<TaskStatusHistory>>.Failure(ex.Message);
+            }
         }
 
-        public async Task<IEnumerable<Domain.Models.TaskAssignment>> getTasksByStatusAsync(int idStatus)
+        public async Task<Response<IEnumerable<Domain.Models.TaskStatusHistory>>> getTasksByStatusAsync(int idStatus)
         {
             if (idStatus <= 0 || idStatus == null)  return null!;
 
-            var task = await repositoryTask.getTasksByStatusAsync(idStatus);
+            Response<IEnumerable<Domain.Models.TaskStatusHistory>> task = await repositoryTask.getTasksByStatusAsync(idStatus);
+
+            return task;
+        }
+
+        public async Task<Response<IEnumerable<TaskStatusHistory>>> getUnassignedTasks()
+        {
+            
+            Response<IEnumerable<Domain.Models.TaskStatusHistory>> task = await repositoryTask.getUnassignedTasks();
+
             return task;
         }
 
@@ -92,6 +117,21 @@ namespace Application.Services.Generic
         public System.Threading.Tasks.Task updateTaskAsync(Domain.Models.Task task)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Response<IEnumerable<TaskState>>> getStateTask() => await repositoryTask.getStateTask();
+        
+        public async Task<Response<bool>> addStateTaskAssigment(int idTaskAssigned, StatusTaskE state) => await repositoryTask.addStateTaskAssigment(idTaskAssigned, state);
+
+        public async Task<Response<bool>> assingIntervalTime(int idTaskAssigned, DateTime startTime, DateTime endTime, DateTime? statimeTimeStimated = null, DateTime? endTimeStimated = null)
+        {
+            var result = await repositoryTask.assingIntervalTime(idTaskAssigned, startTime, endTime, statimeTimeStimated, endTimeStimated);
+
+            if (!result.Data)
+            {
+                return result;
+            }
+            return result;
         }
     }
 }

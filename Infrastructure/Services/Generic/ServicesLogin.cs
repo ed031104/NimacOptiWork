@@ -41,7 +41,7 @@ namespace Application.Services.Generic
                 return false;
             }
 
-            _userSession.SetSession(roleUser.User.Id, roleUser.User.Email, roleUser.User.Email, roleUser.Rol.Name);
+            _userSession.SetSession(roleUser.User.Id, roleUser.User.Email, roleUser.User.Email, roleUser.Rol.Name, roleUser.Rol.Id);
 
             return true;
         }

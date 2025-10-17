@@ -1,14 +1,15 @@
-﻿using Infraestructure.Context;
-using AutoMapper;
+﻿using AutoMapper;
 using Domain.Enums;
 using Domain.Interfaces.Repositories;
+using Domain.Models;
+using Infraestructure.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
-using Domain.Models;
 
 namespace Infraestructure.Repositories
 {
@@ -51,7 +52,7 @@ namespace Infraestructure.Repositories
                 {
                     TaskAssignment = taskAssignment,
                     TaskAssignmentId = taskAssignment.TaskAssignmentId,
-                    TaskStateId = (int)StatusTaskE.ALAESPERA, // Estado inicial
+                    TaskStateId = (int)StatusTaskE.CREADO, // Estado inicial
                     ChangedDate = DateTime.Now,
                     ChangedBy = _userSession.UserName
                 };
@@ -70,6 +71,7 @@ namespace Infraestructure.Repositories
 
         public async System.Threading.Tasks.Task assignTaskToUserAsync(int idTask, int idUser)
         {
+            var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 //actualizar el campo user id en la tabla task assignment
@@ -83,10 +85,49 @@ namespace Infraestructure.Repositories
                 taskAssignment.AssignedDate = DateTime.Now;
                 _context.TaskAssignments.Update(taskAssignment);
                 await _context.SaveChangesAsync();
+
+                //crear un nuevo registro en la tabla task status history con el estado asignado
+                var taskStatusHistory = new Entities.TaskStatusHistory
+                {
+                    TaskAssignment = taskAssignment,
+                    TaskAssignmentId = taskAssignment.TaskAssignmentId,
+                    TaskStateId = (int)StatusTaskE.ENPROGRESO, // Estado asignado
+                    ChangedDate = DateTime.Now,
+                    ChangedBy = _userSession.UserName
+                };
+                await _context.TaskStatusHistories.AddAsync(taskStatusHistory);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public Task<Response<bool>> assingIntervalTime(int idTaskAssigned, DateTime startTime, DateTime endTime, DateTime? statimeTimeStimated = null, DateTime? endTimeStimated = null)
+        {
+            try
+            {
+                var findTaskAssigned = _context.TaskAssignments.Find(idTaskAssigned);
+                if (findTaskAssigned == null)
+                {
+                    return new Task<Response<bool>>(() => Response<bool>.Failure("Tarea no encontrada"));
+                }
+                findTaskAssigned.DateStarted = startTime;
+                findTaskAssigned.DateCompleted = endTime;
+                findTaskAssigned.TimeEstimatedStart = statimeTimeStimated;
+                findTaskAssigned.TimeEstimatedEnd = endTimeStimated;
+
+                _context.TaskAssignments.Update(findTaskAssigned);
+                _context.SaveChanges();
+                return new Task<Response<bool>>(() => Response<bool>.Success(true));
+            }
+            catch
+            {
+                return new Task<Response<bool>>(() => Response<bool>.Failure("Error al asignar el intervalo de tiempo"));
             }
         }
 
@@ -188,75 +229,229 @@ namespace Infraestructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Domain.Models.TaskAssignment>> getTaskByUserAssigned(int idUser)
+        public async Task<Response<IEnumerable<Domain.Models.TaskStatusHistory>>> getTaskByUserAssigned(int idUser)
         {
+            Response<IEnumerable<Domain.Models.TaskStatusHistory>> response;
             try
             {
-                var tasksByUser = await _context.TaskAssignments
-                    .Where(ta => ta.AssignedTo == idUser)
-                    .ToListAsync(); // Fix: Convert IAsyncEnumerable to a List
+                //traer todas las tareas asignadas a un usuario con el último estado asignado
+                var taskStatusHistories = await _context.TaskStatusHistories
+                        .Where(tsh => tsh.TaskAssignment.AssignedToNavigation.Id == idUser &&
+                                      tsh.ChangedDate == _context.TaskStatusHistories
+                                          .Where(inner => inner.TaskAssignmentId == tsh.TaskAssignmentId)
+                                          .Max(inner => inner.ChangedDate))
+                        .Include(tsh => tsh.TaskAssignment)
+                            .ThenInclude(ta => ta.Task)
+                        .Include(tsh => tsh.TaskAssignment)
+                            .ThenInclude(ta => ta.AssignedToNavigation)
+                        .Include(tsh => tsh.TaskState)
+                        .ToListAsync();
 
-                var domainTasks = _mapper.Map<IEnumerable<Domain.Models.TaskAssignment>>(tasksByUser);
-                return domainTasks;
+
+                if (taskStatusHistories == null || !taskStatusHistories.Any())
+                {
+                    response = Response<IEnumerable<Domain.Models.TaskStatusHistory>>.Failure("No tasks found for the user");
+                    return response;
+                }
+
+                var domainTaskStatusHistories = taskStatusHistories.Select(tsh => new Domain.Models.TaskStatusHistory(
+                    tsh.TaskStatusHistoryId,
+                    new Domain.Models.TaskAssignment(
+                        tsh.TaskAssignment.TaskAssignmentId,
+                        new Domain.Models.Task(
+                            tsh.TaskAssignment.Task.TaskId,
+                            tsh.TaskAssignment.Task.InvoiceNumber,
+                            tsh.TaskAssignment.Task.Description,
+                            tsh.TaskAssignment.Task.CreatedDate,
+                            tsh.TaskAssignment.Task.Createdby,
+                            tsh.TaskAssignment.Task.TaskCode
+                        ),
+                        tsh.TaskAssignment.AssignedToNavigation != null
+                            ? new Domain.Models.User(
+                                tsh.TaskAssignment.AssignedToNavigation.Id,
+                                tsh.TaskAssignment.AssignedToNavigation.Email,
+                                tsh.TaskAssignment.AssignedToNavigation.Username,
+                                tsh.TaskAssignment.AssignedToNavigation.Password,
+                                tsh.TaskAssignment.AssignedToNavigation.DateCreated,
+                                tsh.TaskAssignment.AssignedToNavigation.DateModified,
+                                tsh.TaskAssignment.AssignedToNavigation.Active
+                            )
+                            : null,
+                        tsh.TaskAssignment.AssignedDate,
+                        tsh.TaskAssignment.DateStarted,
+                        tsh.TaskAssignment.DateCompleted,
+                        tsh.TaskAssignment.TimeEstimatedStart,
+                        tsh.TaskAssignment.TimeEstimatedEnd
+                    ),
+                    new Domain.Models.TaskState(
+                        tsh.TaskState.TaskStateId,
+                        tsh.TaskState.TaskStateName
+                    ),
+                    tsh.ChangedDate,
+                    tsh.ChangedBy
+                ));
+
+
+                response = Response<IEnumerable<Domain.Models.TaskStatusHistory>>.Success(domainTaskStatusHistories);
+                return response;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                response = Response<IEnumerable<Domain.Models.TaskStatusHistory>>.Failure(ex.Message);
+                return response;
             }
         }
 
-        public async Task<IEnumerable<Domain.Models.TaskAssignment>> getTasksByStatusAsync(int idStatus)
+        public async Task<Response<IEnumerable<Domain.Models.TaskStatusHistory>>> getTasksByStatusAsync(int idStatus)
         {
+            Response<IEnumerable<Domain.Models.TaskStatusHistory>> response;
             try
             {
-                var domainTasks = await _context.TaskAssignments
-                    .Where(ta => ta.TaskStatusHistories.Any(tsh => tsh.TaskStateId == idStatus))
-                    .Include(ta => ta.Task)
-                    .Include(ta => ta.AssignedToNavigation)
-                    .Select(ta => new Domain.Models.TaskAssignment
-                    {
-                        TaskAssignmentId = ta.TaskAssignmentId,
-                        AssignedDate = ta.AssignedDate,
-                        DateStarted = ta.DateStarted,
-                        DateCompleted = ta.DateCompleted,
-                        TimeEstimatedStart = ta.TimeEstimatedStart,
-                        TimeEstimatedEnd = ta.TimeEstimatedEnd,
-                        Task = ta.Task != null ? new Domain.Models.Task
-                        {
-                            TaskId = ta.Task.TaskId,
-                            Createdby = ta.Task.Createdby,
-                            CreatedDate = ta.Task.CreatedDate,
-                            Description = ta.Task.Description,
-                            InvoiceNumber = ta.Task.InvoiceNumber,
-                            TaskCode = ta.Task.TaskCode
-                        } : null,
-                        AssignedTo = ta.AssignedToNavigation != null ? new Domain.Models.User
-                        {
-                            Id = ta.AssignedToNavigation.Id,
-                            Username = ta.AssignedToNavigation.Username,
-                            Password = ta.AssignedToNavigation.Password,
-                            Email = ta.AssignedToNavigation.Email,
-                            Active = ta.AssignedToNavigation.Active,
-                            DateCreated = ta.AssignedToNavigation.DateCreated,
-                            DateModified = ta.AssignedToNavigation.DateModified
-                        } : null
-                    })
+
+                var taskStatusHistories = await _context.TaskStatusHistories
+                    .Where(tsh => tsh.TaskStateId == idStatus &&
+                                  tsh.ChangedDate == _context.TaskStatusHistories
+                                      .Where(inner => inner.TaskAssignmentId == tsh.TaskAssignmentId)
+                                      .Max(inner => inner.ChangedDate))
+                    .Include(tsh => tsh.TaskAssignment)
+                        .ThenInclude(ta => ta.Task)
+                    .Include(tsh => tsh.TaskAssignment)
+                        .ThenInclude(ta => ta.AssignedToNavigation)
+                    .Include(tsh => tsh.TaskState)
                     .ToListAsync();
 
-                return domainTasks;
+                if (taskStatusHistories == null || !taskStatusHistories.Any())
+                {
+                    response = Response<IEnumerable<Domain.Models.TaskStatusHistory>>.Failure("No tasks found with the specified status");
+                    return response;
+                }
 
+                // Mapeo manual de la entidad ORM a la entidad de dominio
+                var domainTaskStatusHistories = taskStatusHistories.Select(tsh => new Domain.Models.TaskStatusHistory(
+                    tsh.TaskStatusHistoryId,
+                    new Domain.Models.TaskAssignment(
+                        tsh.TaskAssignment.TaskAssignmentId,
+                        new Domain.Models.Task(
+                            tsh.TaskAssignment.Task.TaskId,
+                            tsh.TaskAssignment.Task.InvoiceNumber,
+                            tsh.TaskAssignment.Task.Description,
+                            tsh.TaskAssignment.Task.CreatedDate,
+                            tsh.TaskAssignment.Task.Createdby,
+                            tsh.TaskAssignment.Task.TaskCode
+                        ),
+                        tsh.TaskAssignment.AssignedToNavigation != null
+                            ? new Domain.Models.User(
+                                tsh.TaskAssignment.AssignedToNavigation.Id,
+                                tsh.TaskAssignment.AssignedToNavigation.Email,
+                                tsh.TaskAssignment.AssignedToNavigation.Username,
+                                tsh.TaskAssignment.AssignedToNavigation.Password,
+                                tsh.TaskAssignment.AssignedToNavigation.DateCreated,
+                                tsh.TaskAssignment.AssignedToNavigation.DateModified,
+                                tsh.TaskAssignment.AssignedToNavigation.Active
+                            )
+                            : null,
+                        tsh.TaskAssignment.AssignedDate,
+                        tsh.TaskAssignment.DateStarted,
+                        tsh.TaskAssignment.DateCompleted,
+                        tsh.TaskAssignment.TimeEstimatedStart,
+                        tsh.TaskAssignment.TimeEstimatedEnd
+                    ),
+                    new Domain.Models.TaskState(
+                        tsh.TaskState.TaskStateId,
+                        tsh.TaskState.TaskStateName
+                    ),
+                    tsh.ChangedDate,
+                    tsh.ChangedBy
+                ));
+
+                response = Response<IEnumerable<Domain.Models.TaskStatusHistory>>.Success(domainTaskStatusHistories);
+
+                return response;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                response = Response<IEnumerable<Domain.Models.TaskStatusHistory>>.Failure(ex.Message);
+                return response;
             }
         }
 
-        public System.Threading.Tasks.Task TaskStateAsync(int idTask, StatusInvoicesE state)
+        public async Task<Response<IEnumerable<TaskStatusHistory>>> getUnassignedTasks()
+        {
+            Response<IEnumerable<Domain.Models.TaskStatusHistory>> response;
+            try
+            {
+                //traer todas las tareas con el ultimo estado asignado
+                var taskStatusHistories = await _context.TaskStatusHistories
+                    .Include(tsh => tsh.TaskAssignment)
+                        .ThenInclude(ta => ta.Task)
+                    .Include(tsh => tsh.TaskAssignment)
+                        .ThenInclude(ta => ta.AssignedToNavigation)
+                    .Include(tsh => tsh.TaskState)
+                    .Where(tsh => tsh.TaskStateId == (int)StatusTaskE.CREADO && tsh.TaskAssignment.AssignedTo == null)
+                    .GroupBy(tsh => tsh.TaskAssignmentId)
+                    .Select(g => g.OrderByDescending(tsh => tsh.ChangedDate).FirstOrDefault())
+                    .ToListAsync();
+
+                if (taskStatusHistories == null || !taskStatusHistories.Any())
+                {
+                    response = Response<IEnumerable<Domain.Models.TaskStatusHistory>>.Failure("No tasks found with the specified status");
+                    return response;
+                }
+
+                // Mapeo manual de la entidad ORM a la entidad de dominio
+                var domainTaskStatusHistories = taskStatusHistories.Select(tsh => new Domain.Models.TaskStatusHistory(
+                    tsh.TaskStatusHistoryId,
+                    new Domain.Models.TaskAssignment(
+                        tsh.TaskAssignment.TaskAssignmentId,
+                        new Domain.Models.Task(
+                            tsh.TaskAssignment.Task.TaskId,
+                            tsh.TaskAssignment.Task.InvoiceNumber,
+                            tsh.TaskAssignment.Task.Description,
+                            tsh.TaskAssignment.Task.CreatedDate,
+                            tsh.TaskAssignment.Task.Createdby,
+                            tsh.TaskAssignment.Task.TaskCode
+                        ),
+                        tsh.TaskAssignment.AssignedToNavigation != null
+                            ? new Domain.Models.User(
+                                tsh.TaskAssignment.AssignedToNavigation.Id,
+                                tsh.TaskAssignment.AssignedToNavigation.Email,
+                                tsh.TaskAssignment.AssignedToNavigation.Username,
+                                tsh.TaskAssignment.AssignedToNavigation.Password,
+                                tsh.TaskAssignment.AssignedToNavigation.DateCreated,
+                                tsh.TaskAssignment.AssignedToNavigation.DateModified,
+                                tsh.TaskAssignment.AssignedToNavigation.Active
+                            )
+                            : null,
+                        tsh.TaskAssignment.AssignedDate,
+                        tsh.TaskAssignment.DateStarted,
+                        tsh.TaskAssignment.DateCompleted,
+                        tsh.TaskAssignment.TimeEstimatedStart,
+                        tsh.TaskAssignment.TimeEstimatedEnd
+                    ),
+                    new Domain.Models.TaskState(
+                        tsh.TaskState.TaskStateId,
+                        tsh.TaskState.TaskStateName
+                    ),
+                    tsh.ChangedDate,
+                    tsh.ChangedBy
+                ));
+
+                response = Response<IEnumerable<Domain.Models.TaskStatusHistory>>.Success(domainTaskStatusHistories);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response = Response<IEnumerable<Domain.Models.TaskStatusHistory>>.Failure(ex.Message);
+                return response;
+            }
+        }
+
+        public System.Threading.Tasks.Task TaskStateAsync(int idTaskAssigned, StatusTaskE state)
         {
             try
             {
-                var task = _context.TaskAssignments.Find(idTask);
+                var task = _context.TaskAssignments.Find(idTaskAssigned);
                 if (task == null)
                 {
                     throw new Exception("Task not found");
@@ -277,9 +472,16 @@ namespace Infraestructure.Repositories
             }
         }
 
-        public System.Threading.Tasks.Task updateStatusTaskAsync(int idTask, int idStatus)
-        {
-            throw new NotImplementedException();
+        public async System.Threading.Tasks.Task updateStatusTaskAsync(TaskAssignment taskAssignment)
+        {            
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public System.Threading.Tasks.Task updateTaskAsync(Domain.Models.Task task)
@@ -298,6 +500,67 @@ namespace Infraestructure.Repositories
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<Response<IEnumerable<TaskState>>> getStateTask()
+        {
+            try
+            {
+                // Obtener los estados de la base de datos
+                var taskStates = await _context.TaskStates.AsNoTracking().ToListAsync();
+
+                // Mapear a las entidades de dominio
+                var domainTaskStates = _mapper.Map<IEnumerable<Domain.Models.TaskState>>(taskStates);
+
+                // Validar si hay resultados
+                if (!domainTaskStates.Any())
+                {
+                    return Response<IEnumerable<TaskState>>.Failure("No task states found");
+                }
+
+                return Response<IEnumerable<TaskState>>.Success(domainTaskStates);
+            }
+            catch (AutoMapperMappingException ex)
+            {
+                return Response<IEnumerable<TaskState>>.Failure($"Mapping error: {ex.Message}");
+            }
+            catch (DbUpdateException ex)
+            {
+                return Response<IEnumerable<TaskState>>.Failure($"Database error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return Response<IEnumerable<TaskState>>.Failure($"Unexpected error: {ex.Message}");
+            }
+        }
+
+        public async Task<Response<bool>> addStateTaskAssigment(int idTaskAssigned, StatusTaskE state)
+        {
+            try
+            {
+                //verificar si ya esxiste el estado para la tarea asignada
+                var existingState = await _context.TaskStatusHistories
+                    .FirstOrDefaultAsync(tsh => tsh.TaskAssignmentId == idTaskAssigned && tsh.TaskStateId == (int)state);
+                if (existingState != null)
+                    {
+                    return Response<bool>.Failure("El estado ya existe para esta tarea asignada");
+                }
+
+                await _context.TaskStatusHistories.AddAsync(new Entities.TaskStatusHistory
+                {
+                    TaskAssignmentId = idTaskAssigned,
+                    TaskStateId = (int)state,
+                    ChangedDate = DateTime.Now,
+                    ChangedBy = _userSession.UserName
+                });
+                
+                await _context.SaveChangesAsync();
+                return Response<bool>.Success(true);
+            }
+            catch (Exception e)
+            { 
+                return Response<bool>.Failure(e.Message);
             }
         }
     }

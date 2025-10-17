@@ -1,3 +1,4 @@
+using Domain.Enums;
 using Domain.Interfaces.Services;
 using Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using NimacOptiWork.Page;
+using NimacOptiWork.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,8 +25,9 @@ namespace NimacOptiWork
 {
     public sealed partial class Menu : Window
     {
-
+        private readonly Dictionary<userRole, List<string>> _roleAction;
         UserSession userSession;
+
 
         public Menu()
         {
@@ -32,9 +35,19 @@ namespace NimacOptiWork
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(SimpleTitleBar); // Set the custom title bar element
-            
+
             userSession = App.AppHost.Services.GetRequiredService<UserSession>();
+            
+            _roleAction = new()
+            {
+                [userRole.administrador] = new List<string> { "buttonGestionUsers", "buttonGestionTask", "buttonBacklog", "buttonGestionActivity", "buttonDashboard" },
+                [userRole.almacenista] = new List<string> { "buttonBacklog", "buttonGestionTask" },   
+            };
+
+            _ = validateRole();
         }
+
+     
 
         private void navView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
@@ -73,5 +86,16 @@ namespace NimacOptiWork
                 }
             }
         }
+
+        #region Role validation
+        private async System.Threading.Tasks.Task validateRole()
+        {
+            if (userSession.IdRole == null || Content is not FrameworkElement frameworkElement)
+                return;
+
+            var role = (userRole)userSession.IdRole;
+            UIHelpers.ApplyRoleUI(frameworkElement, role, _roleAction);
+        }
+        #endregion
     }
 }

@@ -56,6 +56,8 @@ namespace NimacOptiWork
                    services.AddScoped<IServicesTask, ServicesTask>();
                    services.AddScoped<IRepositoryLogin, RepositoryLogin>();
                    services.AddScoped<IServicesLogin, ServicesLogin>();
+                   services.AddScoped<IRepositoryInvoice, RepositoryInvoice>();
+                   services.AddScoped<IServicesInvoice, ServiceInvoice>();
                    services.AddSingleton<UserSession>();
                })
                .Build();

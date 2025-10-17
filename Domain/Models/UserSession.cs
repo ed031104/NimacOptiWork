@@ -11,27 +11,30 @@ namespace Domain.Models
         public int? UserId { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public int? IdRole { get; set; }
         public string Role { get; set; } = string.Empty;
         public DateTime LoginTime { get; set; }
 
         public UserSession() { }
 
-        public UserSession(int userId, string userName, string email, string role)
+        public UserSession(int userId, string userName, string email, string role, int? idRole)
         {
             UserId = userId;
             UserName = userName;
             Email = email;
             Role = role;
             LoginTime = DateTime.Now;
+            IdRole = idRole;
         } 
 
-        public void SetSession(int userId, string userName, string email, string role)
+        public void SetSession(int userId, string userName, string email, string role, int? idRole)
         {
             UserId = userId;
             UserName = userName;
             Email = email;
             Role = role;
             LoginTime = DateTime.Now;
+            IdRole = idRole;
         }
 
         public bool IsLoggedIn()
@@ -46,6 +49,7 @@ namespace Domain.Models
             Email = string.Empty;
             Role = string.Empty;
             LoginTime = DateTime.MinValue;
+            IdRole = null;
         }
     }
 }

@@ -15,7 +15,7 @@
         <Grid.RowDefinitions>
             <!-- Fila 0 -->
             <RowDefinition Height="Auto"/>
-            
+
             <!-- Fila 1 -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -34,7 +34,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            
+
             <ScrollViewer
 
                 HorizontalScrollBarVisibility="Auto"
@@ -48,11 +48,10 @@
                     AutoGenerateColumns="False"
                     xmlns:tv="using:WinUI.TableView"
                 >
-
                     <tv:TableView.Columns>
                         <tv:TableViewTextColumn Header="Invoice ID" Binding="{Binding InvoiceId}" IsReadOnly="True" Width="50"/>
-                        <tv:TableViewTextColumn Header="STNO" Binding="{Binding Stno}" />
-                        <tv:TableViewTextColumn Header="BOSFX" Binding="{Binding Bosfx}" />
+                        <tv:TableViewTextColumn Header="Sucursal" Binding="{Binding Stno}" />
+                        <!-- <tv:TableViewTextColumn Header="BOSFX" Binding="{Binding Bosfx}" />-->
                         <tv:TableViewTemplateColumn Header="Status">
                             <tv:TableViewTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -60,35 +59,35 @@
                                 </DataTemplate>
                             </tv:TableViewTemplateColumn.CellTemplate>
                         </tv:TableViewTemplateColumn>
-                        <tv:TableViewTextColumn Header="SLSTYP" Binding="{Binding Slstyp}" Width="100"/>
-                        <tv:TableViewTextColumn Header="ENDT8" Binding="{Binding Endt8}" Width="100"/>
-                        <tv:TableViewTextColumn Header="DOCSU" Binding="{Binding Docsu}" Width="100"/>
-                        <tv:TableViewTextColumn Header="RFDCNO" Binding="{Binding Rfdcno}" Width="100"/>
-                        <tv:TableViewTextColumn Header="LNNO" Binding="{Binding Lnno}" Width="100"/>
-                        <tv:TableViewTextColumn Header="SOS1" Binding="{Binding Sos1}" Width="100"/>
-                        <tv:TableViewTextColumn Header="PAN020" Binding="{Binding Pano20}" Width="100"/>
-                        <tv:TableViewTextColumn Header="DS18" Binding="{Binding Ds18}" Width="100"/>
-                        <tv:TableViewTextColumn Header="QRQY" Binding="{Binding Orqy}" Width="100"/>
-                        <tv:TableViewTextColumn Header="BOIMCT" Binding="{Binding Boimct}" Width="100"/>
-                        <tv:TableViewTextColumn Header="SPQTY" Binding="{Binding Spqty}" Width="100"/>
-                        <tv:TableViewTextColumn Header="TRXCD" Binding="{Binding Trxcd}" Width="100"/>
-                        <tv:TableViewTextColumn Header="UNCS" Binding="{Binding Uncs}" Width="100"/>
-                        <tv:TableViewTextColumn Header="UNLS" Binding="{Binding Unls}" Width="100"/>
-                        <tv:TableViewTextColumn Header="UNSEL" Binding="{Binding Unsel}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Tipo_Venta" Binding="{Binding Slstyp}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Fecha_Creación" Binding="{Binding Endt8}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Status_Doc" Binding="{Binding Docsu}" Width="100"/>
+                        <tv:TableViewTextColumn Header="#Documento" Binding="{Binding Rfdcno}" Width="100"/>
+                        <!-- <tv:TableViewTextColumn Header="LMNO" Binding="{Binding Lnno}" Width="100"/> -->
+                        <tv:TableViewTextColumn Header="Casa" Binding="{Binding Sos1}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Num_Part" Binding="{Binding Pano20}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Descripcion_Parte" Binding="{Binding Ds18}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Cant_Ordenada" Binding="{Binding Orqy}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Cant_Back_Order" Binding="{Binding Boimct}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Cant_Asignada" Binding="{Binding Spqty}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Cód_Transacción" Binding="{Binding Trxcd}" Width="100"/>
+                        <!-- <tv:TableViewTextColumn Header="UNCS" Binding="{Binding Uncs}" Width="100"/>-->
+                        <!-- <tv:TableViewTextColumn Header="UNLS" Binding="{Binding Unls}" Width="100"/>-->
+                        <!--  <tv:TableViewTextColumn Header="UNSEL" Binding="{Binding Unsel}" Width="100"/>-->
                         <tv:TableViewTextColumn Header="WTUM" Binding="{Binding Wtum}" Width="100"/>
-                        <tv:TableViewTextColumn Header="CUNM" Binding="{Binding Cunm}" Width="100"/>
-                        <tv:TableViewTextColumn Header="SPVIDS" Binding="{Binding Spvids}" Width="100"/>
-                        <tv:TableViewTextColumn Header="Date Entry" Binding="{Binding DateEntry}"/>
+                        <tv:TableViewTextColumn Header="Cód_Cliente" Binding="{Binding Cunm}" Width="100"/>
+                        <tv:TableViewTextColumn Header="Mensaje_Almacén" Binding="{Binding Spvids}" Width="100"/>
+                        <!--  <tv:TableViewTextColumn Header="Date Entry" Binding="{Binding DateEntry}"/>-->
 
                         <!-- Columna editar -->
                         <tv:TableViewTemplateColumn Header="Editar">
                             <tv:TableViewTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button 
-                                Click="editInvoiceEventBtn"
-                                Tag="{Binding InvoiceId}"
-                                HorizontalAlignment="Center"
-                                >
+                Click="editInvoiceEventBtn"
+                Tag="{Binding InvoiceId}"
+                HorizontalAlignment="Center"
+                >
                                         <Button.Content>
                                             <FontIcon Glyph="&#xE70F;" FontSize="16"/>
                                         </Button.Content>
@@ -103,10 +102,10 @@
                                 <DataTemplate>
                                     <Grid>
                                         <Button 
-                                        Click="deleteInvoiceEventBtn"
-                                        Tag="{Binding InvoiceId}"
-                                        HorizontalAlignment="Center"
-                                    >
+                        Click="deleteInvoiceEventBtn"
+                        Tag="{Binding InvoiceId}"
+                        HorizontalAlignment="Center"
+                    >
                                             <Button.Content>
                                                 <FontIcon Glyph="&#xE74D;" FontSize="16"/>
                                             </Button.Content>
@@ -117,6 +116,8 @@
                         </tv:TableViewTemplateColumn>
                     </tv:TableView.Columns>
                 </tv:TableView>
+
+
             </ScrollViewer>
 
             <StackPanel Grid.Row="2" HorizontalAlignment="Center">
@@ -142,7 +143,7 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    
+
                     <StackPanel Grid.Row="0" Spacing="60" Orientation="Horizontal"  Padding="0 10 0 20" VerticalAlignment="Center">
                         <TextBlock Text="Formulario para editar facturas" FontSize="16" VerticalAlignment="Center"
                                 HorizontalAlignment="Center"/>
@@ -186,7 +187,7 @@
         </Grid>
 
 
- 
+
 
 
         <InfoBar
@@ -194,12 +195,12 @@
             x:Name="infoBar"
             IsOpen="False"
         />
-        
+
         <!-- Overlay de carga -->
         <Grid Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="loadingOverlay" Background="#80000000" Visibility="Collapsed" Canvas.ZIndex="10">
             <ProgressRing Width="60" Height="60" IsActive="True"/>
         </Grid>
-        
+
     </Grid>
 
 </Page>

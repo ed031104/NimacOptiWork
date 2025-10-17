@@ -7,7 +7,7 @@ public partial class TaskStatusHistory
 {
     public int TaskStatusHistoryId { get; set; }
 
-    public virtual Task Task { get; set; } = null!;
+    public virtual TaskAssignment TaskAssignment { get; set; } = null!;
 
     public virtual TaskState TaskState { get; set; } = null!;
     
@@ -19,10 +19,10 @@ public partial class TaskStatusHistory
     public TaskStatusHistory()
     {
     }
-    public TaskStatusHistory(int taskStatusHistoryId, Task task, TaskState taskState, DateTime changedDate, string changedBy)
+    public TaskStatusHistory(int taskStatusHistoryId, TaskAssignment task, TaskState taskState, DateTime changedDate, string changedBy)
     {
         TaskStatusHistoryId = taskStatusHistoryId;
-        this.Task = task;
+        TaskAssignment = task;
         this.TaskState = taskState;
         ChangedDate = changedDate;
         ChangedBy = changedBy;
@@ -42,9 +42,9 @@ public partial class TaskStatusHistory
             _taskStatusHistory.TaskStatusHistoryId = taskStatusHistoryId;
             return this;
         }
-        public Builder WithTask(Task task)
+        public Builder WithTask(TaskAssignment task)
         {
-            _taskStatusHistory.Task = task;
+            _taskStatusHistory.TaskAssignment = task;
             return this;
         }
         public Builder WithTaskState(TaskState taskState)
